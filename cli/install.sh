@@ -166,7 +166,7 @@ install_hermes_deploy() {
     tmp_dir=$(mktemp -d)
     trap "rm -rf $tmp_dir" EXIT
 
-    local archive_url="https://github.com/unrealandychan/hermes-deploy/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
+    local archive_url="https://github.com/unrealandychan/Hermes-Easy-Deploy/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
     info "Downloading from ${archive_url}..."
     curl -fsSL "$archive_url" | tar -xz -C "$tmp_dir" --strip-components=1
     src_dir="$tmp_dir"
