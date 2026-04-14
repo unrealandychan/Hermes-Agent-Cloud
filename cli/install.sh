@@ -153,11 +153,26 @@ install_hermes_deploy() {
   info "Installing Hermes-Easy-Deploy v${HERMES_DEPLOY_VERSION}..."
 
   local src_dir=""
+  local main_bin=""
 
   # If this script is running from a local clone, use that
   local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
-  if [[ -n "$script_dir" && -f "${script_dir}/Hermes-Easy-Deploy" ]]; then
+  local script_source="${BASH_SOURCE[0]:-}"
+  if [[ -n "$script_source" && "$script_source" != "bash" && "$script_source" != "-bash" ]]; then
+    script_dir="$(cd "$(dirname "$script_source")" 2>/dev/null && pwd || echo "")"
+  else
+    script_dir=""
+  fi
+
+  if [[ -n "$script_dir" ]]; then
+    if [[ -f "${script_dir}/hermes-deploy" ]]; then
+      main_bin="hermes-deploy"
+    elif [[ -f "${script_dir}/Hermes-Easy-Deploy" ]]; then
+      main_bin="Hermes-Easy-Deploy"
+    fi
+  fi
+
+  if [[ -n "$script_dir" && -n "$main_bin" ]]; then
     src_dir="$script_dir"
     info "Using local source: $src_dir"
   else
@@ -170,20 +185,31 @@ install_hermes_deploy() {
     info "Downloading from ${archive_url}..."
     curl -fsSL "$archive_url" | tar -xz -C "$tmp_dir" --strip-components=1
     src_dir="$tmp_dir"
+
+    if [[ -f "$src_dir/hermes-deploy" ]]; then
+      main_bin="hermes-deploy"
+    elif [[ -f "$src_dir/Hermes-Easy-Deploy" ]]; then
+      main_bin="Hermes-Easy-Deploy"
+    fi
+  fi
+
+  if [[ -z "$main_bin" ]]; then
+    die "Could not find CLI executable in source (expected hermes-deploy or Hermes-Easy-Deploy)."
   fi
 
   # Install to /usr/local/lib/Hermes-Easy-Deploy
   sudo rm -rf "$INSTALL_LIB"
   sudo mkdir -p "$INSTALL_LIB"
   sudo cp -r "$src_dir/." "$INSTALL_LIB/"
-  sudo chmod +x "$INSTALL_LIB/Hermes-Easy-Deploy"
+  sudo chmod +x "$INSTALL_LIB/$main_bin"
   sudo find "$INSTALL_LIB/lib" -name "*.sh" -exec chmod +x {} \;
   sudo find "$INSTALL_LIB/scripts" -name "*.sh" -exec chmod +x {} \;
 
   # Symlink the main binary into PATH
-  sudo ln -sf "$INSTALL_LIB/Hermes-Easy-Deploy" "$INSTALL_BIN/Hermes-Easy-Deploy"
+  sudo ln -sf "$INSTALL_LIB/$main_bin" "$INSTALL_BIN/hermes-deploy"
+  sudo ln -sf "$INSTALL_LIB/$main_bin" "$INSTALL_BIN/Hermes-Easy-Deploy"
 
-  ok "Hermes-Easy-Deploy installed → $INSTALL_BIN/Hermes-Easy-Deploy"
+  ok "Hermes-Easy-Deploy installed → $INSTALL_BIN/hermes-deploy"
 }
 
 # ── Main ────────────────────────────────────────────────────────────────────
@@ -200,9 +226,10 @@ main() {
   echo -e "${GREEN}${BOLD}Installation complete!${RESET}"
   echo ""
   echo -e "  ${BOLD}Get started:${RESET}"
-  echo "    Hermes-Easy-Deploy               # launch the wizard"
-  echo "    Hermes-Easy-Deploy --help        # show all commands"
-  echo "    Hermes-Easy-Deploy version       # confirm version"
+  echo "    hermes-deploy                    # launch the wizard"
+  echo "    hermes-deploy --help             # show all commands"
+  echo "    hermes-deploy version            # confirm version"
+  echo "    Hermes-Easy-Deploy               # legacy alias"
   echo ""
 }
 
