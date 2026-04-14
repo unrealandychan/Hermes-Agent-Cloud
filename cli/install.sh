@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# install.sh — One-line installer for hermes-deploy
-# Usage: curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
+# install.sh — One-line installer for Hermes-Easy-Deploy
+# Usage: curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash
 #    or: bash install.sh  (from a local clone)
 set -euo pipefail
 
 HERMES_DEPLOY_VERSION="1.0.0"
 INSTALL_BIN="/usr/local/bin"
-INSTALL_LIB="/usr/local/lib/hermes-deploy"
+INSTALL_LIB="/usr/local/lib/Hermes-Easy-Deploy"
 
 BOLD='\033[1m'
 GREEN='\033[0;32m'
@@ -20,7 +20,7 @@ ARCH="$(uname -m)"
 
 banner() {
   echo ""
-  echo -e "${BOLD}hermes-deploy installer — v${HERMES_DEPLOY_VERSION}${RESET}"
+  echo -e "${BOLD}Hermes-Easy-Deploy installer — v${HERMES_DEPLOY_VERSION}${RESET}"
   echo -e "${DIM}─────────────────────────────────────────${RESET}"
   echo ""
 }
@@ -148,16 +148,16 @@ install_jq() {
   ok "jq installed"
 }
 
-# ── Install hermes-deploy ────────────────────────────────────────────────────
+# ── Install Hermes-Easy-Deploy ────────────────────────────────────────────────────
 install_hermes_deploy() {
-  info "Installing hermes-deploy v${HERMES_DEPLOY_VERSION}..."
+  info "Installing Hermes-Easy-Deploy v${HERMES_DEPLOY_VERSION}..."
 
   local src_dir=""
 
   # If this script is running from a local clone, use that
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
-  if [[ -n "$script_dir" && -f "${script_dir}/hermes-deploy" ]]; then
+  if [[ -n "$script_dir" && -f "${script_dir}/Hermes-Easy-Deploy" ]]; then
     src_dir="$script_dir"
     info "Using local source: $src_dir"
   else
@@ -172,18 +172,18 @@ install_hermes_deploy() {
     src_dir="$tmp_dir"
   fi
 
-  # Install to /usr/local/lib/hermes-deploy
+  # Install to /usr/local/lib/Hermes-Easy-Deploy
   sudo rm -rf "$INSTALL_LIB"
   sudo mkdir -p "$INSTALL_LIB"
   sudo cp -r "$src_dir/." "$INSTALL_LIB/"
-  sudo chmod +x "$INSTALL_LIB/hermes-deploy"
+  sudo chmod +x "$INSTALL_LIB/Hermes-Easy-Deploy"
   sudo find "$INSTALL_LIB/lib" -name "*.sh" -exec chmod +x {} \;
   sudo find "$INSTALL_LIB/scripts" -name "*.sh" -exec chmod +x {} \;
 
   # Symlink the main binary into PATH
-  sudo ln -sf "$INSTALL_LIB/hermes-deploy" "$INSTALL_BIN/hermes-deploy"
+  sudo ln -sf "$INSTALL_LIB/Hermes-Easy-Deploy" "$INSTALL_BIN/Hermes-Easy-Deploy"
 
-  ok "hermes-deploy installed → $INSTALL_BIN/hermes-deploy"
+  ok "Hermes-Easy-Deploy installed → $INSTALL_BIN/Hermes-Easy-Deploy"
 }
 
 # ── Main ────────────────────────────────────────────────────────────────────
@@ -200,9 +200,9 @@ main() {
   echo -e "${GREEN}${BOLD}Installation complete!${RESET}"
   echo ""
   echo -e "  ${BOLD}Get started:${RESET}"
-  echo "    hermes-deploy               # launch the wizard"
-  echo "    hermes-deploy --help        # show all commands"
-  echo "    hermes-deploy version       # confirm version"
+  echo "    Hermes-Easy-Deploy               # launch the wizard"
+  echo "    Hermes-Easy-Deploy --help        # show all commands"
+  echo "    Hermes-Easy-Deploy version       # confirm version"
   echo ""
 }
 

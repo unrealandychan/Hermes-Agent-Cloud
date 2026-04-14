@@ -14,33 +14,33 @@ desktop.ini
 *.swo
 *.orig
 
-# ── Node / Next.js (hermes-deploy-site) ─────────────────────────────────────
-hermes-deploy-site/node_modules/
-hermes-deploy-site/.next/
-hermes-deploy-site/.vercel/
-hermes-deploy-site/out/
-hermes-deploy-site/.env
-hermes-deploy-site/.env.local
-hermes-deploy-site/.env*.local
-hermes-deploy-site/npm-debug.log*
-hermes-deploy-site/yarn-debug.log*
-hermes-deploy-site/yarn-error.log*
+# ── Node / Next.js (Hermes-Easy-Deploy-site) ─────────────────────────────────────
+Hermes-Easy-Deploy-site/node_modules/
+Hermes-Easy-Deploy-site/.next/
+Hermes-Easy-Deploy-site/.vercel/
+Hermes-Easy-Deploy-site/out/
+Hermes-Easy-Deploy-site/.env
+Hermes-Easy-Deploy-site/.env.local
+Hermes-Easy-Deploy-site/.env*.local
+Hermes-Easy-Deploy-site/npm-debug.log*
+Hermes-Easy-Deploy-site/yarn-debug.log*
+Hermes-Easy-Deploy-site/yarn-error.log*
 
-# ── Terraform (hermes-deploy) ────────────────────────────────────────────────
-hermes-deploy/terraform/**/.terraform/
-hermes-deploy/terraform/**/terraform.tfstate
-hermes-deploy/terraform/**/terraform.tfstate.backup
-hermes-deploy/terraform/**/terraform.tfstate.d/
-hermes-deploy/terraform/**/.terraform.lock.hcl
-hermes-deploy/terraform/**/terraform.tfvars
-hermes-deploy/terraform/**/terraform.tfvars.json
-hermes-deploy/terraform/**/*.auto.tfvars
-hermes-deploy/terraform/**/crash.log
-hermes-deploy/terraform/**/override.tf
-hermes-deploy/terraform/**/override.tf.json
+# ── Terraform (Hermes-Easy-Deploy) ────────────────────────────────────────────────
+Hermes-Easy-Deploy/terraform/**/.terraform/
+Hermes-Easy-Deploy/terraform/**/terraform.tfstate
+Hermes-Easy-Deploy/terraform/**/terraform.tfstate.backup
+Hermes-Easy-Deploy/terraform/**/terraform.tfstate.d/
+Hermes-Easy-Deploy/terraform/**/.terraform.lock.hcl
+Hermes-Easy-Deploy/terraform/**/terraform.tfvars
+Hermes-Easy-Deploy/terraform/**/terraform.tfvars.json
+Hermes-Easy-Deploy/terraform/**/*.auto.tfvars
+Hermes-Easy-Deploy/terraform/**/crash.log
+Hermes-Easy-Deploy/terraform/**/override.tf
+Hermes-Easy-Deploy/terraform/**/override.tf.json
 
 # ── Bash CLI secrets / runtime state ────────────────────────────────────────
-hermes-deploy/config/hermes.yaml
+Hermes-Easy-Deploy/config/hermes.yaml
 *.tfvars
 
 # ── Logs ─────────────────────────────────────────────────────────────────────

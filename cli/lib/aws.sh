@@ -243,7 +243,7 @@ aws_secrets() {
       --region "$region"
 
   success "Key updated in SSM."
-  warn "To apply: hermes-deploy ssh  →  sudo systemctl restart hermes-gateway"
+  warn "To apply: Hermes-Easy-Deploy ssh  →  sudo systemctl restart hermes-gateway"
 }
 
 # ─── Destroy ────────────────────────────────────────────────────────────────

@@ -5,13 +5,13 @@ import { Copy, Check } from "lucide-react";
 const INSTALL_CMD = `curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash`;
 
 const COMMANDS = [
-  { cmd: "hermes-deploy",                          desc: "Launch interactive wizard" },
-  { cmd: "hermes-deploy deploy --cloud aws",       desc: "Deploy to AWS (flags mode)" },
-  { cmd: "hermes-deploy status --cloud azure",     desc: "Show running instance info" },
-  { cmd: "hermes-deploy ssh --cloud gcp",          desc: "SSH into the instance" },
-  { cmd: "hermes-deploy logs --cloud aws",         desc: "Tail journalctl logs" },
-  { cmd: "hermes-deploy secrets --cloud azure",    desc: "Update API keys in Key Vault" },
-  { cmd: "hermes-deploy destroy --cloud aws",      desc: "Tear down infra completely" },
+  { cmd: "Hermes-Easy-Deploy",                          desc: "Launch interactive wizard" },
+  { cmd: "Hermes-Easy-Deploy deploy --cloud aws",       desc: "Deploy to AWS (flags mode)" },
+  { cmd: "Hermes-Easy-Deploy status --cloud azure",     desc: "Show running instance info" },
+  { cmd: "Hermes-Easy-Deploy ssh --cloud gcp",          desc: "SSH into the instance" },
+  { cmd: "Hermes-Easy-Deploy logs --cloud aws",         desc: "Tail journalctl logs" },
+  { cmd: "Hermes-Easy-Deploy secrets --cloud azure",    desc: "Update API keys in Key Vault" },
+  { cmd: "Hermes-Easy-Deploy destroy --cloud aws",      desc: "Tear down infra completely" },
 ];
 
 function CopyButton({ text }: { text: string }) {

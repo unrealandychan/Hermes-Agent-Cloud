@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ui.sh — All TUI helpers for hermes-deploy (requires gum by Charm)
+# ui.sh — All TUI helpers for Hermes-Easy-Deploy (requires gum by Charm)
 
 # ─── ANSI fallbacks (used before gum is confirmed available) ────────────────
 RED='\033[0;31m'
@@ -175,7 +175,7 @@ post_deploy_guide() {
 
   gum style --bold --foreground 255 "  1.  Direct SSH (key pair)"
   gum style --foreground 245        "      ssh -i ${ssh_key} ${ssh_user}@${ip}"
-  gum style --foreground 245        "      Shortcut: $(gum style --foreground 212 'hermes-deploy ssh')"
+  gum style --foreground 245        "      Shortcut: $(gum style --foreground 212 'Hermes-Easy-Deploy ssh')"
   echo ""
 
   gum style --bold --foreground 255 "  2.  Cloud-native shell  (no open SSH port needed)"
@@ -202,18 +202,18 @@ post_deploy_guide() {
   echo ""
 
   gum style --bold --foreground 255 "  4.  Quick commands"
-  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-deploy ssh')       open a shell on the instance"
-  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-deploy logs')      stream hermes-gateway logs live"
-  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-deploy status')    show instance IP and health"
-  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-deploy secrets')   rotate or add API keys"
-  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-deploy destroy')   tear it all down"
+  gum style --foreground 245 "      $(gum style --foreground 212 'Hermes-Easy-Deploy ssh')       open a shell on the instance"
+  gum style --foreground 245 "      $(gum style --foreground 212 'Hermes-Easy-Deploy logs')      stream hermes-gateway logs live"
+  gum style --foreground 245 "      $(gum style --foreground 212 'Hermes-Easy-Deploy status')    show instance IP and health"
+  gum style --foreground 245 "      $(gum style --foreground 212 'Hermes-Easy-Deploy secrets')   rotate or add API keys"
+  gum style --foreground 245 "      $(gum style --foreground 212 'Hermes-Easy-Deploy destroy')   tear it all down"
   echo ""
 
   # ── First boot checklist ───────────────────────────────────────────────
   divider "FIRST BOOT CHECKLIST  (~2 min after deploy)"
   echo ""
   gum style --foreground 245 "  a)  Verify Hermes installed correctly"
-  gum style --foreground 245 "      hermes-deploy ssh"
+  gum style --foreground 245 "      Hermes-Easy-Deploy ssh"
   gum style --foreground 245 "      \$ hermes doctor"
   echo ""
   gum style --foreground 245 "  b)  Check the systemd gateway service is running"
@@ -234,7 +234,7 @@ post_deploy_guide() {
   echo ""
   gum style --foreground 245 "  •  SSH (port 22) and gateway (port 8080) are restricted"
   gum style --foreground 245 "     to your current IP only. If your IP changes, re-run:"
-  gum style --foreground 245 "     $(gum style --foreground 212 'hermes-deploy deploy') and update the firewall rule."
+  gum style --foreground 245 "     $(gum style --foreground 212 'Hermes-Easy-Deploy deploy') and update the firewall rule."
   echo ""
 
   case "$cloud" in
@@ -259,7 +259,7 @@ post_deploy_guide() {
   # ── Destroy reminder ───────────────────────────────────────────────────
   divider "DESTROY WHEN DONE"
   echo ""
-  gum style --foreground 245 "  hermes-deploy destroy"
+  gum style --foreground 245 "  Hermes-Easy-Deploy destroy"
   gum style --foreground 245 "  You will be asked to confirm before anything is deleted."
   echo ""
 }

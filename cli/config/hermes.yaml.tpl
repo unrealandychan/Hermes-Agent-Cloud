@@ -1,5 +1,5 @@
 # Hermes Agent configuration
-# Managed by hermes-deploy
+# Managed by Hermes-Easy-Deploy
 
 terminal:
   backend: docker          # Sandboxed Docker execution (recommended)

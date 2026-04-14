@@ -9,22 +9,22 @@ const STEPS = [
   {
     n: "02",
     title: "Run the wizard",
-    desc: "Type hermes-deploy and follow the interactive prompts. Choose your cloud, region, instance size, and configure your LLM API keys — all step-by-step.",
-    code: "hermes-deploy",
+    desc: "Type Hermes-Easy-Deploy and follow the interactive prompts. Choose your cloud, region, instance size, and configure your LLM API keys — all step-by-step.",
+    code: "Hermes-Easy-Deploy",
     accent: "#a78bfa",
   },
   {
     n: "03",
     title: "Deploy with Terraform",
     desc: "The CLI calls terraform apply in the background. Secrets are vaulted in SSM / Key Vault / Secret Manager automatically. A live spinner tracks every step.",
-    code: "hermes-deploy deploy --cloud aws",
+    code: "Hermes-Easy-Deploy deploy --cloud aws",
     accent: "#38bdf8",
   },
   {
     n: "04",
     title: "Access your Agent",
-    desc: "Get your public IP, SSH command, and gateway URL instantly. Use hermes-deploy status, logs, or ssh at any time.",
-    code: "hermes-deploy status --cloud aws",
+    desc: "Get your public IP, SSH command, and gateway URL instantly. Use Hermes-Easy-Deploy status, logs, or ssh at any time.",
+    code: "Hermes-Easy-Deploy status --cloud aws",
     accent: "#34d399",
   },
 ];

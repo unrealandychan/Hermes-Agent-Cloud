@@ -28,6 +28,6 @@ resource "aws_security_group" "hermes" {
 
   tags = {
     Name    = "hermes-sg"
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }

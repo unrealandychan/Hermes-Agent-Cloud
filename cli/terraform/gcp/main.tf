@@ -40,7 +40,7 @@ resource "google_compute_instance" "hermes" {
   }
 
   service_account {
-    email  = google_service_account.hermes.email
+    email = google_service_account.hermes.email
     # cloud-platform scope is required for Secret Manager API access
     scopes = ["cloud-platform"]
   }
@@ -60,6 +60,6 @@ resource "google_compute_instance" "hermes" {
   tags = ["hermes-agent"]
 
   labels = {
-    project = "hermes-deploy"
+    project = "Hermes-Easy-Deploy"
   }
 }

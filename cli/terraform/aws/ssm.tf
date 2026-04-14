@@ -12,7 +12,7 @@ resource "aws_ssm_parameter" "openrouter_api_key" {
   overwrite   = true
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_ssm_parameter" "openai_api_key" {
   overwrite   = true
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_ssm_parameter" "anthropic_api_key" {
   overwrite   = true
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -54,6 +54,6 @@ resource "aws_ssm_parameter" "gemini_api_key" {
   overwrite   = true
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }

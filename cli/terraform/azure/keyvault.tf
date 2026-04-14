@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "hermes" {
   }
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -38,7 +38,7 @@ resource "azurerm_key_vault_secret" "openrouter_api_key" {
   depends_on = [azurerm_key_vault_access_policy.vm_identity]
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_key_vault_secret" "openai_api_key" {
   depends_on = [azurerm_key_vault_access_policy.vm_identity]
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -64,7 +64,7 @@ resource "azurerm_key_vault_secret" "anthropic_api_key" {
   depends_on = [azurerm_key_vault_access_policy.vm_identity]
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -77,6 +77,6 @@ resource "azurerm_key_vault_secret" "gemini_api_key" {
   depends_on = [azurerm_key_vault_access_policy.vm_identity]
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }

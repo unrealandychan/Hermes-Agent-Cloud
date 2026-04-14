@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 const LINES = [
-  { delay: 0,    text: "$ hermes-deploy",                  type: "cmd"   },
+  { delay: 0,    text: "$ Hermes-Easy-Deploy",                  type: "cmd"   },
   { delay: 600,  text: "",                                  type: "blank" },
   { delay: 700,  text: "  ⚡  Hermes Easy Deploy  v1.0.0", type: "banner"},
   { delay: 900,  text: "  Deploy the Hermes Agent anywhere.", type: "dim" },
@@ -20,8 +20,8 @@ const LINES = [
   { delay: 5400, text: "  ✓  Gateway:    http://43.198.77.12:8080", type: "ok" },
   { delay: 5600, text: "",                                  type: "blank" },
   { delay: 5700, text: "  SSH:    ssh ubuntu@43.198.77.12", type: "hint" },
-  { delay: 5900, text: "  Logs:   hermes-deploy logs --cloud aws", type: "hint" },
-  { delay: 6100, text: "  Destroy: hermes-deploy destroy --cloud aws", type: "hint" },
+  { delay: 5900, text: "  Logs:   Hermes-Easy-Deploy logs --cloud aws", type: "hint" },
+  { delay: 6100, text: "  Destroy: Hermes-Easy-Deploy destroy --cloud aws", type: "hint" },
 ];
 
 function colorFor(type: string) {

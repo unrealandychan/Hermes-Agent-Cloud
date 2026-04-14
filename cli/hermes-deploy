@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# hermes-deploy — Deploy the Hermes Agent to AWS, Azure, or GCP
-# Usage: hermes-deploy [command] [options]
+# Hermes-Easy-Deploy — Deploy the Hermes Agent to AWS, Azure, or GCP
+# Usage: Hermes-Easy-Deploy [command] [options]
 set -euo pipefail
 
 HERMES_DEPLOY_VERSION="1.0.0"
 HERMES_DEPLOY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HERMES_DEPLOY_HOME="${HOME}/.hermes-deploy"
+HERMES_DEPLOY_HOME="${HOME}/.Hermes-Easy-Deploy"
 
 # ─── Source libraries ───────────────────────────────────────────────────────
 # shellcheck source=lib/enums.sh  — must be first; other libs depend on enum arrays
@@ -51,7 +51,7 @@ cmd_help() {
   hermes_banner
   echo ""
   gum style --foreground 212 --bold "USAGE"
-  echo "  hermes-deploy [command] [options]"
+  echo "  Hermes-Easy-Deploy [command] [options]"
   echo ""
   gum style --foreground 212 --bold "COMMANDS"
   printf "  %-12s %s\n" "deploy"  "Deploy Hermes Agent to a cloud provider (default)"
@@ -70,18 +70,18 @@ cmd_help() {
   printf "  %-20s %s\n" "--help"                 "Show this help"
   echo ""
   gum style --foreground 212 --bold "EXAMPLES"
-  echo "  hermes-deploy                               # launch the wizard"
-  echo "  hermes-deploy deploy --cloud aws            # deploy to AWS"
-  echo "  hermes-deploy deploy --cloud gcp --dry-run  # preview GCP plan"
-  echo "  hermes-deploy ssh                           # SSH into the instance"
-  echo "  hermes-deploy secrets                       # rotate API keys"
-  echo "  hermes-deploy destroy                       # tear everything down"
+  echo "  Hermes-Easy-Deploy                               # launch the wizard"
+  echo "  Hermes-Easy-Deploy deploy --cloud aws            # deploy to AWS"
+  echo "  Hermes-Easy-Deploy deploy --cloud gcp --dry-run  # preview GCP plan"
+  echo "  Hermes-Easy-Deploy ssh                           # SSH into the instance"
+  echo "  Hermes-Easy-Deploy secrets                       # rotate API keys"
+  echo "  Hermes-Easy-Deploy destroy                       # tear everything down"
   echo ""
 }
 
 # ─── Version ────────────────────────────────────────────────────────────────
 cmd_version() {
-  echo "hermes-deploy v${HERMES_DEPLOY_VERSION}"
+  echo "Hermes-Easy-Deploy v${HERMES_DEPLOY_VERSION}"
 }
 
 # ─── Deploy ─────────────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ cmd_deploy() {
 cmd_status() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: Hermes-Easy-Deploy deploy"; exit 1; }
 
   hermes_banner
   case "$CLOUD" in
@@ -125,7 +125,7 @@ cmd_status() {
 cmd_ssh() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: Hermes-Easy-Deploy deploy"; exit 1; }
 
   case "$CLOUD" in
     aws)   aws_ssh   ;;
@@ -138,7 +138,7 @@ cmd_ssh() {
 cmd_logs() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: Hermes-Easy-Deploy deploy"; exit 1; }
 
   case "$CLOUD" in
     aws)   aws_logs   ;;
@@ -151,7 +151,7 @@ cmd_logs() {
 cmd_secrets() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: Hermes-Easy-Deploy deploy"; exit 1; }
 
   hermes_banner
   case "$CLOUD" in
@@ -165,7 +165,7 @@ cmd_secrets() {
 cmd_destroy() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: Hermes-Easy-Deploy deploy"; exit 1; }
 
   hermes_banner
   confirm_destructive "This will PERMANENTLY destroy your Hermes instance and all data."

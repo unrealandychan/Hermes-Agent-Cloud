@@ -5,7 +5,7 @@ resource "azurerm_virtual_network" "hermes" {
   resource_group_name = azurerm_resource_group.hermes.name
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -24,7 +24,7 @@ resource "azurerm_public_ip" "hermes" {
   sku                 = "Standard"
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -60,7 +60,7 @@ resource "azurerm_network_security_group" "hermes" {
   }
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 
@@ -77,7 +77,7 @@ resource "azurerm_network_interface" "hermes" {
   }
 
   tags = {
-    Project = "hermes-deploy"
+    Project = "Hermes-Easy-Deploy"
   }
 }
 

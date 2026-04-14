@@ -2,9 +2,9 @@
 locals {
   secrets = {
     openrouter = { id = "hermes-openrouter-api-key", value = var.openrouter_api_key }
-    openai     = { id = "hermes-openai-api-key",     value = var.openai_api_key }
-    anthropic  = { id = "hermes-anthropic-api-key",  value = var.anthropic_api_key }
-    gemini     = { id = "hermes-gemini-api-key",     value = var.gemini_api_key }
+    openai     = { id = "hermes-openai-api-key", value = var.openai_api_key }
+    anthropic  = { id = "hermes-anthropic-api-key", value = var.anthropic_api_key }
+    gemini     = { id = "hermes-gemini-api-key", value = var.gemini_api_key }
   }
   # Only create resources for keys that were actually provided
   active_secrets = {
@@ -22,7 +22,7 @@ resource "google_secret_manager_secret" "hermes" {
   }
 
   labels = {
-    project = "hermes-deploy"
+    project = "Hermes-Easy-Deploy"
   }
 }
 

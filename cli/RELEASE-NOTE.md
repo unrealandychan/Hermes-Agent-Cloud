@@ -1,6 +1,6 @@
 # Release Notes
 
-All notable changes to `hermes-deploy` are documented here.
+All notable changes to `Hermes-Easy-Deploy` are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -21,11 +21,11 @@ with a single command through a beautiful `gum`-powered TUI.
 
 ### Added
 
-#### Core CLI (`hermes-deploy`)
+#### Core CLI (`Hermes-Easy-Deploy`)
 - Subcommand router: `deploy`, `status`, `ssh`, `logs`, `secrets`, `destroy`, `version`, `help`
 - Global flags: `--cloud`, `--region`, `--dry-run`, `--no-color`, `--help`
 - `--cloud` flag validated against `VALID_CLOUDS` enum on parse — exits with a clear error on invalid value
-- Config persistence in `~/.hermes-deploy/config` (key=value store, no external dependencies)
+- Config persistence in `~/.Hermes-Easy-Deploy/config` (key=value store, no external dependencies)
 
 #### TUI (`lib/ui.sh` + Charm `gum`)
 - `hermes_banner` — double-bordered Hermes ASCII header with version
@@ -61,7 +61,7 @@ with a single command through a beautiful `gum`-powered TUI.
 - **Google Gemini** (`GEMINI_API_KEY`)
 - At least one key required; wizard validates before proceeding
 - All keys optional individually; only provided keys are created in the cloud vault
-- `hermes-deploy secrets` command to rotate any key without re-deploying
+- `Hermes-Easy-Deploy secrets` command to rotate any key without re-deploying
 
 #### AWS provider (`lib/aws.sh` + `terraform/aws/`)
 - 6-step wizard: region → instance type → SSH key pair → API keys → summary → confirm
@@ -80,7 +80,7 @@ with a single command through a beautiful `gum`-powered TUI.
 - System-assigned Managed Identity for Key Vault access (no credentials on instance)
 - Azure Key Vault (standard SKU, soft-delete 7 days) with deployer access policy + VM accessor policy
 - NSG: rules for SSH + gateway from deployer IP; VNet + Public IP (static, Standard SKU)
-- `az ssh` extension auto-installed if missing on `hermes-deploy ssh`
+- `az ssh` extension auto-installed if missing on `Hermes-Easy-Deploy ssh`
 - `azure_secrets`: `az keyvault secret set`
 
 #### GCP provider (`lib/gcp.sh` + `terraform/gcp/`)
@@ -113,7 +113,7 @@ with a single command through a beautiful `gum`-powered TUI.
 - Installs `gum` (Charm apt repo on Debian/Ubuntu, binary on others, brew on macOS)
 - Installs `terraform` (HashiCorp releases)
 - Installs `jq`
-- Copies project to `/usr/local/lib/hermes-deploy`, symlinks binary to `/usr/local/bin`
+- Copies project to `/usr/local/lib/Hermes-Easy-Deploy`, symlinks binary to `/usr/local/bin`
 - Works from local clone or remote archive download
 
 ### Security
@@ -135,10 +135,10 @@ Follow the [Installation section in README.md](./README.md#installation).
 ### Future minor / patch upgrades (1.x.x)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash
 ```
 
-Re-running the installer overwrites the CLI files only. Existing `~/.hermes-deploy/` state
+Re-running the installer overwrites the CLI files only. Existing `~/.Hermes-Easy-Deploy/` state
 (config, Terraform state) is preserved.
 
 ### Breaking changes
@@ -151,9 +151,9 @@ None in 1.0.0 (initial release).
 
 Items under consideration for future releases:
 
-- `hermes-deploy update` — pull latest Hermes Agent version on the running instance
+- `Hermes-Easy-Deploy update` — pull latest Hermes Agent version on the running instance
 - Remote Terraform state backend support (S3 / Azure Storage / GCS)
-- `hermes-deploy firewall --update-ip` — update security rules when deployer IP changes
+- `Hermes-Easy-Deploy firewall --update-ip` — update security rules when deployer IP changes
 - VPC/subnet selection for AWS (currently uses default VPC)
 - Multi-instance support (name flag to manage several deployments per cloud)
 - DigitalOcean and Hetzner provider support

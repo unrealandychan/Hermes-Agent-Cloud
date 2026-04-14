@@ -1,4 +1,4 @@
-# hermes-deploy
+# Hermes-Easy-Deploy
 
 > Beautiful wizard-first CLI to deploy **Hermes Agent** to AWS, Azure, or GCP — in one command.
 
@@ -46,27 +46,27 @@ You only need the CLI for the cloud you are deploying to.
 ### One-liner (recommended)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash
 ```
 
 `install.sh` will:
 1. Install `gum`, `terraform`, and `jq` if missing (via `brew` on macOS, apt/binary on Linux)
-2. Copy the CLI to `/usr/local/lib/hermes-deploy`
-3. Symlink `hermes-deploy` into `/usr/local/bin`
+2. Copy the CLI to `/usr/local/lib/Hermes-Easy-Deploy`
+3. Symlink `Hermes-Easy-Deploy` into `/usr/local/bin`
 
 ### Manual (from source)
 
 ```bash
-git clone https://github.com/unrealandychan/hermes-deploy.git
-cd hermes-deploy
+git clone https://github.com/unrealandychan/Hermes-Easy-Deploy.git
+cd Hermes-Easy-Deploy
 bash install.sh
 ```
 
 ### Verify
 
 ```bash
-hermes-deploy version
-# hermes-deploy v1.0.0
+Hermes-Easy-Deploy version
+# Hermes-Easy-Deploy v1.0.0
 ```
 
 ---
@@ -74,7 +74,7 @@ hermes-deploy version
 ## Quick Start
 
 ```bash
-hermes-deploy            # launches the full interactive wizard
+Hermes-Easy-Deploy            # launches the full interactive wizard
 ```
 
 That's it. The wizard walks you through cloud selection → region → instance size → API keys → confirmation → deploy.
@@ -85,15 +85,15 @@ That's it. The wizard walks you through cloud selection → region → instance 
 
 | Command | Description |
 |---|---|
-| `hermes-deploy` | Launch the full wizard (default when no command given) |
-| `hermes-deploy deploy` | Deploy Hermes Agent (wizard fills any missing flags) |
-| `hermes-deploy status` | Show instance IP, state, and resource IDs |
-| `hermes-deploy ssh` | Open a shell on the deployed instance |
-| `hermes-deploy logs` | Stream live `hermes-gateway` logs |
-| `hermes-deploy secrets` | Rotate or add API keys in the cloud vault |
-| `hermes-deploy destroy` | Tear down all resources (gated by confirmation prompt) |
-| `hermes-deploy version` | Print CLI version |
-| `hermes-deploy help` | Show usage |
+| `Hermes-Easy-Deploy` | Launch the full wizard (default when no command given) |
+| `Hermes-Easy-Deploy deploy` | Deploy Hermes Agent (wizard fills any missing flags) |
+| `Hermes-Easy-Deploy status` | Show instance IP, state, and resource IDs |
+| `Hermes-Easy-Deploy ssh` | Open a shell on the deployed instance |
+| `Hermes-Easy-Deploy logs` | Stream live `hermes-gateway` logs |
+| `Hermes-Easy-Deploy secrets` | Rotate or add API keys in the cloud vault |
+| `Hermes-Easy-Deploy destroy` | Tear down all resources (gated by confirmation prompt) |
+| `Hermes-Easy-Deploy version` | Print CLI version |
+| `Hermes-Easy-Deploy help` | Show usage |
 
 ### Flags
 
@@ -110,7 +110,7 @@ That's it. The wizard walks you through cloud selection → region → instance 
 ## Wizard Walkthrough
 
 ```
-$ hermes-deploy
+$ Hermes-Easy-Deploy
 
 ╔══════════════════════════════════════╗
 ║   ⚡  HERMES DEPLOY  v1.0.0          ║
@@ -182,7 +182,7 @@ At least one key is required. All others are optional. Keys are never stored on 
 Update keys at any time without re-deploying:
 
 ```bash
-hermes-deploy secrets
+Hermes-Easy-Deploy secrets
 # then restart on the instance: sudo systemctl restart hermes-gateway
 ```
 
@@ -198,7 +198,7 @@ hermes-deploy secrets
 
 ---
 
-## Extending hermes-deploy
+## Extending Hermes-Easy-Deploy
 
 The project is designed so that adding a new cloud, region, instance type, or LLM provider requires editing **one file** (`lib/enums.sh`) plus wiring up the execution logic.
 
@@ -206,7 +206,7 @@ The project is designed so that adding a new cloud, region, instance type, or LL
 
 1. **`lib/enums.sh`** — append to `VALID_CLOUDS` and `CLOUD_DISPLAY_LABELS`
 2. **`lib/<cloud>.sh`** — create following the pattern of `lib/aws.sh`
-3. **`hermes-deploy`** — add a `source lib/<cloud>.sh` line and a `case` branch in every command function
+3. **`Hermes-Easy-Deploy`** — add a `source lib/<cloud>.sh` line and a `case` branch in every command function
 4. **`terraform/<cloud>/`** — create the Terraform stack
 5. **`scripts/bootstrap.sh`** — add a `case` branch for secret-pull logic
 
@@ -236,14 +236,14 @@ After a successful deploy the CLI prints a full access guide. Quick reference:
 Shortcut for all:
 
 ```bash
-hermes-deploy ssh     # auto-detects cloud and method
-hermes-deploy logs    # stream hermes-gateway logs live
+Hermes-Easy-Deploy ssh     # auto-detects cloud and method
+Hermes-Easy-Deploy logs    # stream hermes-gateway logs live
 ```
 
 ### First-boot checklist (~2 min after deploy)
 
 ```bash
-hermes-deploy ssh
+Hermes-Easy-Deploy ssh
 
 # inside the instance:
 hermes doctor                            # verify installation
@@ -255,7 +255,7 @@ curl -sf http://localhost:8080/health    # gateway responding
 Or run the bundled verification script:
 
 ```bash
-bash /usr/local/lib/hermes-deploy/scripts/configure.sh
+bash /usr/local/lib/Hermes-Easy-Deploy/scripts/configure.sh
 ```
 
 ---
@@ -316,7 +316,7 @@ sudo systemctl restart hermes-gateway
 
 **Port 8080 not reachable**
 
-Your IP changed. Re-run `hermes-deploy deploy` to update the firewall rule, or manually update the security group / NSG / firewall rule to your new IP.
+Your IP changed. Re-run `Hermes-Easy-Deploy deploy` to update the firewall rule, or manually update the security group / NSG / firewall rule to your new IP.
 
 **`terraform: command not found`**
 
@@ -330,14 +330,14 @@ brew install terraform   # macOS
 ## Project Structure
 
 ```
-hermes-deploy/
-├── hermes-deploy              Main executable
+Hermes-Easy-Deploy/
+├── Hermes-Easy-Deploy              Main executable
 ├── install.sh                 curl-pipe installer
 ├── lib/
 │   ├── enums.sh               All enum definitions + validation helpers  ← extend here
 │   ├── ui.sh                  gum wrappers, banner, post-deploy guide
 │   ├── preflight.sh           Dependency + auth checks
-│   ├── config.sh              Persist/read ~/.hermes-deploy/config
+│   ├── config.sh              Persist/read ~/.Hermes-Easy-Deploy/config
 │   ├── aws.sh                 AWS wizard + management commands
 │   ├── azure.sh               Azure wizard + management commands
 │   └── gcp.sh                 GCP wizard + management commands

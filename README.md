@@ -13,15 +13,15 @@
 ```
 Hermes-Easy-Deploy/
 │
-├── hermes-deploy/                  # 🖥️  The CLI tool
-│   ├── hermes-deploy               # Main executable (bash, chmod +x)
+├── Hermes-Easy-Deploy/                  # 🖥️  The CLI tool
+│   ├── Hermes-Easy-Deploy               # Main executable (bash, chmod +x)
 │   ├── install.sh                  # One-line installer (detects macOS / Linux)
 │   │
 │   ├── lib/                        # Shared bash libraries
 │   │   ├── enums.sh                # ⭐ All valid values + validation functions (extend here)
 │   │   ├── ui.sh                   # gum wrappers — wizard, banners, spinners, post-deploy guide
 │   │   ├── preflight.sh            # Dependency checks (gum, terraform, jq, cloud CLIs)
-│   │   ├── config.sh               # ~/.hermes-deploy/config key-value store
+│   │   ├── config.sh               # ~/.Hermes-Easy-Deploy/config key-value store
 │   │   ├── aws.sh                  # AWS wizard + status/ssh/logs/secrets/destroy
 │   │   ├── azure.sh                # Azure wizard + status/ssh/logs/secrets/destroy
 │   │   └── gcp.sh                  # GCP wizard + status/ssh/logs/secrets/destroy
@@ -57,7 +57,7 @@ Hermes-Easy-Deploy/
 │   ├── README.md                   # CLI-specific documentation
 │   └── RELEASE-NOTE.md             # Changelog
 │
-├── hermes-deploy-site/             # 🌐  Marketing website (Next.js 15)
+├── Hermes-Easy-Deploy-site/             # 🌐  Marketing website (Next.js 15)
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── layout.tsx          # Root layout — Geist fonts, metadata
@@ -91,8 +91,8 @@ Hermes-Easy-Deploy/
 
 | Package | Language | Purpose |
 |---|---|---|
-| `hermes-deploy/` | Bash + Terraform | CLI that provisions Hermes Agent on cloud VMs |
-| `hermes-deploy-site/` | Next.js 15 / TypeScript | Marketing website |
+| `Hermes-Easy-Deploy/` | Bash + Terraform | CLI that provisions Hermes Agent on cloud VMs |
+| `Hermes-Easy-Deploy-site/` | Next.js 15 / TypeScript | Marketing website |
 
 ---
 
@@ -108,20 +108,20 @@ Or manually:
 
 ```bash
 git clone https://github.com/unrealandychan/Hermes-Easy-Deploy
-cd Hermes-Easy-Deploy/hermes-deploy
+cd Hermes-Easy-Deploy/Hermes-Easy-Deploy
 ./install.sh
 ```
 
 ### Run
 
 ```bash
-hermes-deploy                          # interactive wizard
-hermes-deploy deploy --cloud aws       # flags mode
-hermes-deploy status --cloud azure
-hermes-deploy ssh    --cloud gcp
-hermes-deploy logs   --cloud aws
-hermes-deploy secrets --cloud azure
-hermes-deploy destroy --cloud aws
+Hermes-Easy-Deploy                          # interactive wizard
+Hermes-Easy-Deploy deploy --cloud aws       # flags mode
+Hermes-Easy-Deploy status --cloud azure
+Hermes-Easy-Deploy ssh    --cloud gcp
+Hermes-Easy-Deploy logs   --cloud aws
+Hermes-Easy-Deploy secrets --cloud azure
+Hermes-Easy-Deploy destroy --cloud aws
 ```
 
 ---
@@ -129,7 +129,7 @@ hermes-deploy destroy --cloud aws
 ## Run the Website Locally
 
 ```bash
-cd hermes-deploy-site
+cd Hermes-Easy-Deploy-site
 npm install
 npm run dev          # http://localhost:3000
 ```
@@ -159,7 +159,7 @@ At least one provider required. Mixed-provider setups fully supported.
 
 ## Extending
 
-All valid option values live in a single file — **`hermes-deploy/lib/enums.sh`**.
+All valid option values live in a single file — **`Hermes-Easy-Deploy/lib/enums.sh`**.
 To add a new cloud region, instance type, or LLM provider, edit only that file.
 
 ---
