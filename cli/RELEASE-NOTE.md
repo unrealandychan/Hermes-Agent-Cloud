@@ -135,7 +135,7 @@ Follow the [Installation section in README.md](./README.md#installation).
 ### Future minor / patch upgrades (1.x.x)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_ORG/hermes-deploy/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
 ```
 
 Re-running the installer overwrites the CLI files only. Existing `~/.hermes-deploy/` state

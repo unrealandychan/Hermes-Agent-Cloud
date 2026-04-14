@@ -3,7 +3,7 @@ const STEPS = [
     n: "01",
     title: "Install the CLI",
     desc: "Run the one-line installer — it auto-detects macOS or Linux, installs gum, Terraform, and jq, then symlinks the binary to /usr/local/bin.",
-    code: "curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/install.sh | bash",
+    code: "curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash",
     accent: "#f59e0b",
   },
   {

@@ -58,3 +58,5 @@ logs/
 id_rsa
 id_ed25519
 credentials.json
+website/node_modules/
+website/.next/

@@ -101,7 +101,7 @@ Hermes-Easy-Deploy/
 ### Install the CLI
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash
 ```
 
 Or manually:

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh — One-line installer for hermes-deploy
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_ORG/hermes-deploy/main/install.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
 #    or: bash install.sh  (from a local clone)
 set -euo pipefail
 
@@ -166,7 +166,7 @@ install_hermes_deploy() {
     tmp_dir=$(mktemp -d)
     trap "rm -rf $tmp_dir" EXIT
 
-    local archive_url="https://github.com/YOUR_ORG/hermes-deploy/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
+    local archive_url="https://github.com/unrealandychan/hermes-deploy/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
     info "Downloading from ${archive_url}..."
     curl -fsSL "$archive_url" | tar -xz -C "$tmp_dir" --strip-components=1
     src_dir="$tmp_dir"

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
-const INSTALL_CMD = `curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/install.sh | bash`;
+const INSTALL_CMD = `curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Easy-Deploy/main/cli/install.sh | bash`;
 
 const COMMANDS = [
   { cmd: "hermes-deploy",                          desc: "Launch interactive wizard" },

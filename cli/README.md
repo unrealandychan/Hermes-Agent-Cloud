@@ -46,7 +46,7 @@ You only need the CLI for the cloud you are deploying to.
 ### One-liner (recommended)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_ORG/hermes-deploy/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/unrealandychan/hermes-deploy/main/cli/install.sh | bash
 ```
 
 `install.sh` will:
@@ -57,7 +57,7 @@ curl -sSL https://raw.githubusercontent.com/YOUR_ORG/hermes-deploy/main/install.
 ### Manual (from source)
 
 ```bash
-git clone https://github.com/YOUR_ORG/hermes-deploy.git
+git clone https://github.com/unrealandychan/hermes-deploy.git
 cd hermes-deploy
 bash install.sh
 ```
