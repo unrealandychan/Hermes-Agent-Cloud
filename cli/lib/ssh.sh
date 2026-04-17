@@ -34,6 +34,7 @@ ssh_wait() {
 
 # ─── Upload API keys to ~/.hermes/.env ──────────────────────────────────────
 # ssh_upload_env <ip> <user> <key_path> <openrouter> <openai> <anthropic> <gemini>
+# Keys are piped via stdin — they are never embedded in the command string.
 ssh_upload_env() {
   local ip="$1"
   local user="$2"
@@ -45,20 +46,23 @@ ssh_upload_env() {
 
   key="${key/#\~/$HOME}"
 
-  # Build .env content — only include lines for non-empty keys
-  local env_content=""
-  [[ -n "$openrouter_key" ]] && env_content+="OPENROUTER_API_KEY=${openrouter_key}"$'\n'
-  [[ -n "$openai_key"     ]] && env_content+="OPENAI_API_KEY=${openai_key}"$'\n'
-  [[ -n "$anthropic_key"  ]] && env_content+="ANTHROPIC_API_KEY=${anthropic_key}"$'\n'
-  [[ -n "$gemini_key"     ]] && env_content+="GEMINI_API_KEY=${gemini_key}"$'\n'
+  # Build .env content — only include lines for non-empty keys.
+  # printf is used instead of echo to avoid shell expansion of the values.
+  local env_content
+  env_content=$(
+    [[ -n "$openrouter_key" ]] && printf 'OPENROUTER_API_KEY=%s\n' "$openrouter_key" || true
+    [[ -n "$openai_key"     ]] && printf 'OPENAI_API_KEY=%s\n'     "$openai_key"     || true
+    [[ -n "$anthropic_key"  ]] && printf 'ANTHROPIC_API_KEY=%s\n'  "$anthropic_key"  || true
+    [[ -n "$gemini_key"     ]] && printf 'GEMINI_API_KEY=%s\n'     "$gemini_key"     || true
+  )
 
   warn "Uploading API keys to ${user}@${ip}:~/.hermes/.env ..."
-  ssh -i "$key" \
+  # Pipe via stdin — value never appears in the remote command string.
+  printf '%s' "$env_content" | ssh -i "$key" \
       -o StrictHostKeyChecking=accept-new \
       -o ConnectTimeout=10 \
       "${user}@${ip}" \
-      'mkdir -p ~/.hermes && cat > ~/.hermes/.env && chmod 600 ~/.hermes/.env' \
-      <<< "$env_content"
+      'mkdir -p ~/.hermes && cat > ~/.hermes/.env && chmod 600 ~/.hermes/.env'
 
   success "API keys uploaded."
 }
@@ -91,6 +95,7 @@ ssh_install() {
 
 # ─── Update a single key in ~/.hermes/.env and restart the gateway ──────────
 # ssh_update_key <ip> <user> <key_path> <env_var_name> <new_value>
+# The new value is passed via stdin to avoid command injection.
 ssh_update_key() {
   local ip="$1"
   local user="$2"
@@ -101,11 +106,17 @@ ssh_update_key() {
   key="${key/#\~/$HOME}"
 
   warn "Updating ${var_name} on ${user}@${ip} ..."
-  ssh -i "$key" \
+  # Pass the new value via stdin; only the safe alphanumeric var_name is
+  # embedded in the command string.
+  printf '%s' "$new_value" | ssh -i "$key" \
       -o StrictHostKeyChecking=accept-new \
       -o ConnectTimeout=10 \
       "${user}@${ip}" \
-      "sed -i '/^${var_name}=/d' ~/.hermes/.env && echo '${var_name}=${new_value}' >> ~/.hermes/.env && chmod 600 ~/.hermes/.env && sudo systemctl restart hermes-gateway"
+      "read -r val
+       sed -i '/^${var_name}=/d' ~/.hermes/.env
+       printf '%s=%s\n' '${var_name}' \"\$val\" >> ~/.hermes/.env
+       chmod 600 ~/.hermes/.env
+       sudo systemctl restart hermes-gateway"
 
   success "${var_name} updated and hermes-gateway restarted."
 }

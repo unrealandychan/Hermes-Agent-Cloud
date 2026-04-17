@@ -20,7 +20,7 @@ fail() { echo "[$LOG_TAG] ERROR: $*" | tee -a $LOG_FILE >&2; exit 1; }
 exec > >(tee -a $LOG_FILE) 2>&1
 log "Starting Hermes bootstrap"
 
-[[ -f "$HERMES_ENV" ]] || fail "$HERMES_ENV not found — run ssh_upload_env before bootstrap"
+[[ -f "$HERMES_ENV" ]] || fail "$HERMES_ENV not found — API keys must be deployed before running bootstrap"
 
 # ── 1. System packages ──────────────────────────────────────────────────────
 log "Step 1/4: System packages"
