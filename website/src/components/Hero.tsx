@@ -23,7 +23,7 @@ export default function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 badge badge-amber mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
-              v1.0.0 · Now Available · Open Source
+              v1.0.1 · Now Available · Open Source
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 tracking-tight">
@@ -41,7 +41,7 @@ export default function Hero() {
             >
               A beautiful, wizard-first CLI that provisions your{" "}
               <strong className="text-white">Hermes Agent</strong> on AWS, Azure, or GCP
-              with secrets vaulted in IAM-native stores — zero plaintext, zero hassle.
+              — API keys delivered directly over SSH, never stored in Terraform state or cloud vaults.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -78,7 +78,7 @@ export default function Hero() {
                 <span key={cloud} className="badge">{cloud}</span>
               ))}
               <span className="text-xs ml-1" style={{ color: "var(--text-dim)" }}>
-                Terraform-powered · IAM-native secrets
+                Terraform-powered · SSH-delivered secrets
               </span>
             </div>
           </div>

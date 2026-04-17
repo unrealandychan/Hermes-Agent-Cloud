@@ -16,7 +16,7 @@ const STEPS = [
   {
     n: "03",
     title: "Deploy with Terraform",
-    desc: "The CLI calls terraform apply in the background. Secrets are vaulted in SSM / Key Vault / Secret Manager automatically. A live spinner tracks every step.",
+    desc: "The CLI calls terraform apply in the background. API keys are delivered directly over SSH to the instance — never stored in Terraform state or cloud vaults. A live spinner tracks every step.",
     code: "Hermes-Easy-Deploy deploy --cloud aws",
     accent: "#38bdf8",
   },
