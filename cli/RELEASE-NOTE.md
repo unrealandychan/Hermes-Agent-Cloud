@@ -188,7 +188,7 @@ with a single command through a beautiful `gum`-powered TUI.
 - Installs `gum` (Charm apt repo on Debian/Ubuntu, binary on others, brew on macOS)
 - Installs `terraform` (HashiCorp releases)
 - Installs `jq`
-- Copies project to `/usr/local/lib/Hermes Agent Cloud`, symlinks binary to `/usr/local/bin`
+- Copies project to `/usr/local/lib/hermes-agent-cloud`, symlinks binary to `/usr/local/bin`
 - Works from local clone or remote archive download
 
 ### Security

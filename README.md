@@ -14,8 +14,8 @@
 Hermes-Agent-Cloud/
 │
 ├── cli/                                 # 🖥️  The CLI tool
-│   ├── hermes-deploy               # Main executable (bash, chmod +x)
-│   ├── install.sh                  # One-line installer (detects macOS / Linux)
+│   ├── hermes-deploy                    # Main executable (bash, chmod +x)
+│   ├── install.sh                       # One-line installer (detects macOS / Linux)
 │   │
 │   ├── lib/                        # Shared bash libraries
 │   │   ├── enums.sh                # ⭐ All valid values + validation functions (extend here)
