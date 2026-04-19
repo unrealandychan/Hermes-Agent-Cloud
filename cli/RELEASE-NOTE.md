@@ -37,9 +37,9 @@ and the Hermes Agent is always installed from the latest upstream release.
 
 | Stack | Change |
 |---|---|
-| `terraform/aws/security_group.tf` | New ingress rule for port 9119 (`hermes-web-dashboard`) |
+| `terraform/aws/security_group.tf` | New ingress rule for port 9119 |
 | `terraform/azure/network.tf` | New NSG security rule for port 9119 (priority 1003) |
-| `terraform/gcp/firewall.tf` | New `google_compute_firewall.hermes_dashboard` resource for port 9119 |
+| `terraform/gcp/firewall.tf` | New firewall rule for port 9119 |
 
 #### `scripts/bootstrap.sh`
 - Hermes Agent install command now passes `--latest` flag to always pull the
