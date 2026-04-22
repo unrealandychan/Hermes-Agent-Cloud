@@ -1,3 +1,16 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=160&section=header&text=Hermes--Agent--Cloud&fontSize=38&fontColor=ffffff&fontAlignY=38&desc=Deploy+your+Hermes+Agent+to+Cloud+in+one+command&descAlignY=58&descSize=14" alt="Header"/>
+
+[![Stars](https://img.shields.io/github/stars/unrealandychan/Hermes-Agent-Cloud?style=for-the-badge&logo=github&color=f78166&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud/stargazers)
+[![Forks](https://img.shields.io/github/forks/unrealandychan/Hermes-Agent-Cloud?style=for-the-badge&logo=github&color=79c0ff&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud/network/members)
+[![Language](https://img.shields.io/badge/Shell-4EAA25?logo=gnubash&style=for-the-badge&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud)
+[![AWS](https://img.shields.io/badge/AWS-Powered-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white&labelColor=0d1117)](https://aws.amazon.com/)
+
+</div>
+
+---
+
 # Hermes Agent Cloud
 
 > One command. Three clouds. Four LLM providers.
