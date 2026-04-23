@@ -12,6 +12,43 @@ _Changes staged for the next release will appear here._
 
 ---
 
+## [1.0.3] — 2026-04-23
+
+### Overview
+
+Adds multi-profile support — run multiple isolated Hermes Agent instances on the same machine, each with its own API keys, config, port, and systemd service.
+
+### Added
+
+#### Multi-profile support (`lib/profile.sh`)
+- New `profile` command with subcommands: `create`, `list`, `use`, `show`, `remove`
+- `profile create <name>` — interactive wizard that collects API keys and writes an isolated `.env` + `config.yaml` per profile
+- `profile list` — table view of all profiles showing status, web/API ports, config path, and active marker ★
+- `profile use <name>` — switch the active profile
+- `profile show [name]` — display full config and API key list for a profile
+- `profile remove <name>` — delete a profile with confirmation prompt
+
+#### Port allocation
+- Automatic port assignment: `default` uses `9119` (web) + `8080` (API); each additional profile increments both by 1
+- Slot registry persisted at `~/.hermes-agent-cloud/profile_slots`
+
+### Changed
+
+#### `scripts/bootstrap.sh`
+- Accepts `--user`, `--profile`, `--web-port`, `--api-port` arguments (all optional; defaults preserve v1.x behaviour)
+- Registers a named systemd service per profile: `hermes-<name>.service`
+- Writes `config.yaml` with the correct `web.port` for the profile
+
+#### `hermes-deploy`
+- Sources `lib/profile.sh` on startup
+- Added `profile` to the command dispatch table and help text
+
+### Backward Compatibility
+
+Existing single-instance deployments are fully unaffected. They continue to run as the `default` profile — no migration or config changes needed.
+
+---
+
 ## [1.0.2] — 2026-04-19
 
 ### Overview
