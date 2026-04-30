@@ -7,6 +7,7 @@ import FeatureGrid from "@/components/FeatureGrid";
 import HowItWorks from "@/components/HowItWorks";
 import SecuritySection from "@/components/SecuritySection";
 import InstallSection from "@/components/InstallSection";
+import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
         <HowItWorks />
         <SecuritySection />
         <InstallSection />
+        <AboutSection />
       </main>
       <Footer />
     </>

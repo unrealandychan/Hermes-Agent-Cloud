@@ -23,7 +23,7 @@ export default function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 badge badge-amber mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
-              v1.1.0 · Now Available · Open Source
+              v1.3.0 · EBS Persistent Storage · Open Source
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 tracking-tight">
@@ -41,7 +41,8 @@ export default function Hero() {
             >
               A beautiful, wizard-first CLI that provisions your{" "}
               <strong className="text-white">Hermes Agent</strong> on AWS, Azure, or GCP
-              — with IAM permission profiles, built-in billing insights, and secrets vaulted in native cloud stores.
+              — with IAM permission profiles, persistent EBS storage, built-in billing insights,
+              and one-command instance migration.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -78,7 +79,7 @@ export default function Hero() {
                 <span key={cloud} className="badge">{cloud}</span>
               ))}
               <span className="text-xs ml-1" style={{ color: "var(--text-dim)" }}>
-                Terraform-powered · IAM permission profiles · Billing insights
+                Terraform-powered · Persistent EBS · IAM profiles · Billing insights
               </span>
             </div>
           </div>

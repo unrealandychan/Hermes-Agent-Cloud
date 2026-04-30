@@ -1,4 +1,4 @@
-import { Zap, Github } from "lucide-react";
+import { Zap, Github, BookOpen } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -14,7 +14,7 @@ export default function Footer() {
             <span className="text-white">Hermes&#160;</span><span style={{ color: "var(--amber)" }}>Agent</span><span className="text-white">&#160;Cloud</span>
             <span className="text-xs ml-2 px-2 py-0.5 rounded-full border font-normal"
               style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}>
-              v1.0.2
+              v1.3.0
             </span>
           </div>
 
@@ -22,6 +22,7 @@ export default function Footer() {
           <nav className="flex items-center gap-6 text-sm" style={{ color: "var(--text-muted)" }}>
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#install" className="hover:text-white transition-colors">Install</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
             <a
               href="https://github.com/unrealandychan/Hermes-Agent-Cloud"
               target="_blank"
@@ -30,6 +31,15 @@ export default function Footer() {
             >
               <Github size={14} />
               GitHub
+            </a>
+            <a
+              href="https://medium.com/@unrealandychan"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-white transition-colors"
+            >
+              <BookOpen size={14} />
+              Blog
             </a>
           </nav>
 
@@ -46,7 +56,10 @@ export default function Footer() {
           <a href="https://github.com/charmbracelet/gum" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Charm gum</a>
           {" "}·{" "}
           <a href="https://developer.hashicorp.com/terraform" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terraform</a>
-          {" "}· Hermes Agent by NousResearch
+          {" "}·{" "}
+          Made with ❤️ by{" "}
+          <a href="https://github.com/unrealandychan" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Eddie Chan</a>
+          {" "}in Hong Kong
         </div>
       </div>
     </footer>

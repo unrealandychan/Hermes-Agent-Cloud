@@ -2,26 +2,32 @@
 import { useState, useEffect } from "react";
 
 const LINES = [
-  { delay: 0,    text: "$ hermes-agent-cloud",                  type: "cmd"   },
-  { delay: 600,  text: "",                                  type: "blank" },
-  { delay: 700,  text: "  ⚡  Hermes Agent Cloud  v1.0.2", type: "banner"},
-  { delay: 900,  text: "  Deploy the Hermes Agent anywhere.", type: "dim" },
-  { delay: 1100, text: "",                                  type: "blank" },
-  { delay: 1300, text: "  [1/6] Cloud provider   →  AWS",  type: "step"  },
-  { delay: 1700, text: "  [2/6] AWS Region       →  ap-east-1 (Hong Kong)", type: "step" },
-  { delay: 2100, text: "  [3/6] Instance type    →  t3.large (2 vCPU / 8 GB)", type: "step" },
-  { delay: 2500, text: "  [4/6] SSH key          →  ~/.ssh/id_ed25519.pub", type: "step" },
-  { delay: 2900, text: "  [5/6] API keys         →  ✓  2 providers configured", type: "step" },
-  { delay: 3400, text: "  [6/6] Confirm deploy   →  Yes",  type: "step"  },
-  { delay: 3800, text: "",                                  type: "blank" },
-  { delay: 3900, text: "  ⠸  Applying Terraform…",         type: "spin"  },
-  { delay: 5000, text: "  ✓  Hermes Agent deployed!",      type: "ok"    },
-  { delay: 5200, text: "  ✓  Public IP:  43.198.77.12",    type: "ok"    },
-  { delay: 5400, text: "  ✓  Gateway:    http://43.198.77.12:8080", type: "ok" },
-  { delay: 5600, text: "",                                  type: "blank" },
-  { delay: 5700, text: "  SSH:    ssh ubuntu@43.198.77.12", type: "hint" },
-  { delay: 5900, text: "  Logs:   hermes-agent-cloud logs --cloud aws", type: "hint" },
-  { delay: 6100, text: "  Destroy: hermes-agent-cloud destroy --cloud aws", type: "hint" },
+  { delay: 0,    text: "$ hermes-agent-cloud",                        type: "cmd"   },
+  { delay: 600,  text: "",                                             type: "blank" },
+  { delay: 700,  text: "  ██╗  ██╗███████╗██████╗ ███╗   ███╗███████╗███████╗", type: "banner" },
+  { delay: 750,  text: "  ██║  ██║██╔════╝██╔══██╗████╗ ████║██╔════╝██╔════╝", type: "banner" },
+  { delay: 800,  text: "  ███████║█████╗  ██████╔╝██╔████╔██║█████╗  ███████╗", type: "banner" },
+  { delay: 850,  text: "  ██╔══██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══╝  ╚════██║", type: "banner" },
+  { delay: 900,  text: "  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝", type: "banner" },
+  { delay: 950,  text: "  AGENT CLOUD  v1.3.0  ·  AWS · Azure · GCP",  type: "dim"    },
+  { delay: 1100, text: "",                                             type: "blank" },
+  { delay: 1300, text: "  [1/7] Cloud provider   →  AWS",              type: "step"  },
+  { delay: 1700, text: "  [2/7] AWS Region       →  ap-east-1 (Hong Kong)", type: "step" },
+  { delay: 2100, text: "  [3/7] Instance type    →  t3.large (2 vCPU / 8 GB)", type: "step" },
+  { delay: 2400, text: "  [4/7] SSH key          →  ~/.ssh/id_ed25519.pub", type: "step" },
+  { delay: 2700, text: "  [5/7] Permissions      →  S3 + Billing",     type: "step"  },
+  { delay: 3000, text: "  [6/7] Data volume      →  50 GB EBS gp3 (persistent)", type: "step" },
+  { delay: 3400, text: "  [7/7] Confirm deploy   →  Yes",              type: "step"  },
+  { delay: 3800, text: "",                                             type: "blank" },
+  { delay: 3900, text: "  ⠸  Applying Terraform…",                    type: "spin"  },
+  { delay: 5000, text: "  ✓  Hermes Agent deployed!",                 type: "ok"    },
+  { delay: 5200, text: "  ✓  Public IP:  43.198.77.12",               type: "ok"    },
+  { delay: 5350, text: "  ✓  EBS vol-0a1b2c3d  mounted → /mnt/hermes-data", type: "ok" },
+  { delay: 5500, text: "  ✓  Gateway:    http://43.198.77.12:8080",   type: "ok"    },
+  { delay: 5700, text: "",                                             type: "blank" },
+  { delay: 5800, text: "  SSH:     hermes-agent-cloud ssh",            type: "hint"  },
+  { delay: 6000, text: "  Storage: hermes-agent-cloud ebs status",     type: "hint"  },
+  { delay: 6200, text: "  Migrate: hermes-agent-cloud ebs migrate",    type: "hint"  },
 ];
 
 function colorFor(type: string) {
@@ -52,7 +58,7 @@ export default function TerminalDemo() {
         setVisibleCount(0);
         setRestarting(false);
       }, 1200);
-    }, 8500);
+    }, 9000);
     return () => { timers.forEach(clearTimeout); clearTimeout(restart); };
   }, [restarting]);
 
