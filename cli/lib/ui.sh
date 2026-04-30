@@ -2,23 +2,33 @@
 # ui.sh — All TUI helpers for Hermes Agent Cloud (requires gum by Charm)
 
 # ─── ANSI fallbacks (used before gum is confirmed available) ────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-RESET='\033[0m'
+RED='\\033[0;31m'
+GREEN='\\033[0;32m'
+YELLOW='\\033[1;33m'
+CYAN='\\033[0;36m'
+BOLD='\\033[1m'
+RESET='\\033[0m'
 
-# ─── Banner ─────────────────────────────────────────────────────────────────
+# ─── ANSI Art Banner ─────────────────────────────────────────────────────────
+# Pure ANSI escape codes — no gum required at startup.
+# Block-letter style inspired by Claude Code / btop.
 hermes_banner() {
+  # Colour palette
+  local P='\033[38;5;212m'   # pink/coral  — main brand colour
+  local D='\033[38;5;245m'   # dim grey    — subtitles / version
+  local W='\033[38;5;255m'   # near white  — accent
+  local R='\033[0m'           # reset
+
   echo ""
-  gum style \
-    --border double \
-    --border-foreground 212 \
-    --padding "1 6" \
-    --align center \
-    "$(gum style --foreground 212 --bold '⚡  HERMES AGENT CLOUD') $(gum style --foreground 245 "v${HERMES_DEPLOY_VERSION}")" \
-    "$(gum style --foreground 245 'Deploy Hermes Agent to AWS · Azure · GCP')"
+  echo -e "${P}   ██╗  ██╗███████╗██████╗ ███╗   ███╗███████╗███████╗${R}"
+  echo -e "${P}   ██║  ██║██╔════╝██╔══██╗████╗ ████║██╔════╝██╔════╝${R}"
+  echo -e "${P}   ███████║█████╗  ██████╔╝██╔████╔██║█████╗  ███████╗${R}"
+  echo -e "${P}   ██╔══██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══╝  ╚════██║${R}"
+  echo -e "${P}   ██║  ██║███████╗██║  ██║██║ ╚═╝ ██║███████╗███████║${R}"
+  echo -e "${P}   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝${R}"
+  echo ""
+  echo -e "${D}        A G E N T  C L O U D${R}   ${W}v${HERMES_DEPLOY_VERSION}${R}"
+  echo -e "${D}        Deploy Hermes Agent to AWS · Azure · GCP${R}"
   echo ""
 }
 

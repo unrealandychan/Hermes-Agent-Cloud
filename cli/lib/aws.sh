@@ -5,7 +5,7 @@
 
 # ─── Wizard ─────────────────────────────────────────────────────────────────
 aws_wizard() {
-  local steps=6
+  local steps=7
   preflight_check_cloud "aws"
 
   # ── Step 1: Region ────────────────────────────────────────────────────────
@@ -79,13 +79,52 @@ aws_wizard() {
   [[ -z "$perm_summary" ]] && perm_summary=" SSM only"
   success "Selected:${perm_summary}"
 
-  # ── Step 5: Summary ───────────────────────────────────────────────────────
-  step_header 5 $steps "Deployment Summary"
+  # ── Step 5: Persistent Data Volume (EBS) ─────────────────────────────────
+  step_header 5 $steps "Persistent Data Volume  (EBS)"
+
+  gum style --foreground 245 \
+    "An independent EBS volume keeps your Hermes data (config, model cache, chat history)" \
+    "separate from the EC2 instance.  When you upgrade the instance, just detach ↔ reattach." \
+    ""
+
+  local ebs_enabled=true
+  local ebs_size=50
+
+  local ebs_choice
+  ebs_choice=$(choose_one "Persistent data volume" \
+    "enabled  — 50 GB  gp3 (recommended)" \
+    "custom   — choose size" \
+    "disabled — data lives on root disk only  (lost on terminate)")
+
+  case "$ebs_choice" in
+    enabled*)  ebs_enabled=true;  ebs_size=50 ;;
+    custom*)
+      ebs_enabled=true
+      local size_input
+      size_input=$(plain_input "Volume size in GB  (min 20, max 16384)" "50")
+      ebs_size="${size_input:-50}"
+      if ! [[ "$ebs_size" =~ ^[0-9]+$ ]] || (( ebs_size < 20 )); then
+        warn "Invalid size '${ebs_size}', defaulting to 50 GB."
+        ebs_size=50
+      fi
+      ;;
+    disabled*) ebs_enabled=false; ebs_size=0 ;;
+  esac
+
+  if [[ "$ebs_enabled" == "true" ]]; then
+    success "EBS data volume: ${ebs_size} GB gp3  (encrypted, persists independently)"
+  else
+    warn "EBS disabled — data will be lost when instance is terminated."
+  fi
+
+  # ── Step 6: Summary ───────────────────────────────────────────────────────
+  step_header 6 $steps "Deployment Summary"
   summary_table \
     "Cloud"       "AWS" \
     "Region"      "$REGION" \
     "Instance"    "$instance_type" \
     "Disk"        "50 GB gp3 (encrypted)" \
+    "Data Volume" "$([ "$ebs_enabled" = "true" ] && echo "${ebs_size} GB gp3 EBS (persistent)" || echo "disabled")" \
     "Key Pair"    "$key_name" \
     "Allowed IP"  "$my_ip" \
     "Permissions" "${perm_summary# }"
@@ -94,8 +133,8 @@ aws_wizard() {
     "  ℹ  LLM API keys are configured after install via: hermes setup"
   echo ""
 
-  # ── Step 6: Confirm ───────────────────────────────────────────────────────
-  step_header 6 $steps "Deploy"
+  # ── Step 7: Confirm ───────────────────────────────────────────────────────
+  step_header 7 $steps "Deploy"
   gum confirm "Deploy Hermes Agent to AWS (${REGION})?" || { warn "Aborted."; exit 0; }
 
   # ── Prepare workspace ─────────────────────────────────────────────────────
@@ -111,6 +150,8 @@ allowed_ssh_cidr  = "${allowed_cidr}"
 enable_s3         = ${enable_s3}
 enable_billing    = ${enable_billing}
 enable_rds        = ${enable_rds}
+ebs_enabled       = ${ebs_enabled}
+ebs_size          = ${ebs_size}
 EOF
 
   # Persist config
@@ -120,6 +161,8 @@ EOF
   config_set "ssh_key_path" "$ssh_key_path"
   config_set "ssh_user"     "ubuntu"
   config_set "permissions"  "${perm_summary# }"
+  config_set "ebs_enabled"  "$ebs_enabled"
+  config_set "ebs_size"     "$ebs_size"
 
   # ── Terraform ─────────────────────────────────────────────────────────────
   echo ""
@@ -137,21 +180,30 @@ EOF
     terraform -chdir="$tf_dir" apply -auto-approve -no-color
 
   # Capture outputs
-  local ip instance_id
+  local ip instance_id ebs_volume_id
   ip=$(terraform -chdir="$tf_dir" output -raw public_ip 2>/dev/null)
   ip="${ip//$'\n'/}"
   [[ -z "$ip" ]] && ip="unknown"
   instance_id=$(terraform -chdir="$tf_dir" output -raw instance_id 2>/dev/null)
   instance_id="${instance_id//$'\n'/}"
   [[ -z "$instance_id" ]] && instance_id="unknown"
+  ebs_volume_id=$(terraform -chdir="$tf_dir" output -raw ebs_volume_id 2>/dev/null || echo "")
+  [[ "$ebs_volume_id" == "EBS not enabled" ]] && ebs_volume_id=""
 
   config_set "public_ip"   "$ip"
   config_set "instance_id" "$instance_id"
+  [[ -n "$ebs_volume_id" ]] && config_set "ebs_volume_id" "$ebs_volume_id"
 
   # ── SSH-based installation ─────────────────────────────────────────────────
   ssh_wait    "$ip" "ubuntu" "$ssh_key_path"
   ssh_install "$ip" "ubuntu" "$ssh_key_path" \
     "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
+
+  # ── Mount EBS data volume ─────────────────────────────────────────────────
+  if [[ "$ebs_enabled" == "true" && -n "$ebs_volume_id" ]]; then
+    warn "Mounting persistent data volume on instance..."
+    PUBLIC_IP="$ip" SSH_KEY="$ssh_key_path" ebs_attach "$instance_id"
+  fi
 
   post_deploy_guide "aws" "$ip" "$instance_id" "$REGION" "$ssh_key_path"
 }

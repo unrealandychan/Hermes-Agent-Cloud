@@ -39,3 +39,17 @@ variable "enable_rds" {
   type        = bool
   default     = false
 }
+
+# ── EBS Data Volume ───────────────────────────────────────────────────────────
+
+variable "ebs_enabled" {
+  description = "Provision a persistent data EBS volume separate from the root disk"
+  type        = bool
+  default     = true
+}
+
+variable "ebs_size" {
+  description = "Size in GB of the persistent data EBS volume"
+  type        = number
+  default     = 50
+}
