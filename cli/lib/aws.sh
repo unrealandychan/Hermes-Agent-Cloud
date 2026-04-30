@@ -5,7 +5,7 @@
 
 # ─── Wizard ─────────────────────────────────────────────────────────────────
 aws_wizard() {
-  local steps=7
+  local steps=6
   preflight_check_cloud "aws"
 
   # ── Step 1: Region ────────────────────────────────────────────────────────
@@ -64,9 +64,9 @@ aws_wizard() {
 
   local enable_s3=false enable_billing=false enable_rds=false
   case "$perm_choice" in
-    s3*)        enable_s3=true ;;
+    s3\ *)      enable_s3=true ;;
     billing*)   enable_billing=true ;;
-    rds*)       enable_rds=true ;;
+    rds\ *)     enable_rds=true ;;
     s3+billing*) enable_s3=true; enable_billing=true ;;
     s3+rds*)    enable_s3=true; enable_rds=true ;;
     full*)      enable_s3=true; enable_billing=true; enable_rds=true ;;
@@ -79,24 +79,8 @@ aws_wizard() {
   [[ -z "$perm_summary" ]] && perm_summary=" SSM only"
   success "Selected:${perm_summary}"
 
-  # ── Step 5: API Keys ──────────────────────────────────────────────────────
-  step_header 5 $steps "API Keys  (at least one required)"
-  local openrouter_key openai_key anthropic_key gemini_key
-  openrouter_key=$(masked_input "OpenRouter API key")
-  openai_key=$(masked_input "OpenAI API key")
-  anthropic_key=$(masked_input "Anthropic (Claude) API key")
-  gemini_key=$(masked_input "Google Gemini API key")
-
-  local key_count
-  key_count=$(count_keys "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key")
-  if [[ "$key_count" -eq 0 ]]; then
-    error "At least one API key is required."
-    exit 1
-  fi
-  success "${key_count} key(s) provided"
-
-  # ── Step 6: Summary ───────────────────────────────────────────────────────
-  step_header 6 $steps "Deployment Summary"
+  # ── Step 5: Summary ───────────────────────────────────────────────────────
+  step_header 5 $steps "Deployment Summary"
   summary_table \
     "Cloud"       "AWS" \
     "Region"      "$REGION" \
@@ -104,11 +88,14 @@ aws_wizard() {
     "Disk"        "50 GB gp3 (encrypted)" \
     "Key Pair"    "$key_name" \
     "Allowed IP"  "$my_ip" \
-    "Permissions" "${perm_summary# }" \
-    "API Keys"    "${key_count} provided"
+    "Permissions" "${perm_summary# }"
 
-  # ── Step 7: Confirm ───────────────────────────────────────────────────────
-  step_header 7 $steps "Deploy"
+  gum style --foreground 245 \
+    "  ℹ  LLM API keys are configured after install via: hermes setup"
+  echo ""
+
+  # ── Step 6: Confirm ───────────────────────────────────────────────────────
+  step_header 6 $steps "Deploy"
   gum confirm "Deploy Hermes Agent to AWS (${REGION})?" || { warn "Aborted."; exit 0; }
 
   # ── Prepare workspace ─────────────────────────────────────────────────────
@@ -116,7 +103,6 @@ aws_wizard() {
   mkdir -p "$tf_dir"
   cp -r "${HERMES_DEPLOY_DIR}/terraform/aws/." "$tf_dir/"
 
-  # Non-secret tfvars
   cat > "${tf_dir}/terraform.tfvars" <<EOF
 aws_region        = "${REGION}"
 instance_type     = "${instance_type}"
@@ -125,14 +111,6 @@ allowed_ssh_cidr  = "${allowed_cidr}"
 enable_s3         = ${enable_s3}
 enable_billing    = ${enable_billing}
 enable_rds        = ${enable_rds}
-EOF
-
-  # API key tfvars (auto-loaded by Terraform, kept out of terraform.tfvars)
-  cat > "${tf_dir}/secrets.auto.tfvars" <<EOF
-openrouter_api_key = "${openrouter_key}"
-openai_api_key     = "${openai_key}"
-anthropic_api_key  = "${anthropic_key}"
-gemini_api_key     = "${gemini_key}"
 EOF
 
   # Persist config
@@ -171,9 +149,7 @@ EOF
   config_set "instance_id" "$instance_id"
 
   # ── SSH-based installation ─────────────────────────────────────────────────
-  ssh_wait   "$ip" "ubuntu" "$ssh_key_path"
-  ssh_upload_env "$ip" "ubuntu" "$ssh_key_path" \
-    "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key"
+  ssh_wait    "$ip" "ubuntu" "$ssh_key_path"
   ssh_install "$ip" "ubuntu" "$ssh_key_path" \
     "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
 
@@ -219,7 +195,6 @@ aws_ssh() {
   region=$(config_get "region")
   ssh_key=$(config_get "ssh_key_path")
 
-  # Expand tilde
   ssh_key="${ssh_key/#\~/$HOME}"
 
   local method

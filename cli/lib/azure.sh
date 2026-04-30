@@ -5,7 +5,7 @@
 
 # ─── Wizard ─────────────────────────────────────────────────────────────────
 azure_wizard() {
-  local steps=7
+  local steps=6
   preflight_check_cloud "azure"
 
   # Ensure authenticated
@@ -93,24 +93,8 @@ azure_wizard() {
   [[ -z "$azure_perm_summary" ]] && azure_perm_summary=" None (minimal)"
   success "Selected:${azure_perm_summary}"
 
-  # ── Step 5: API Keys ──────────────────────────────────────────────────────
-  step_header 5 $steps "API Keys  (at least one required)"
-  local openrouter_key openai_key anthropic_key gemini_key
-  openrouter_key=$(masked_input "OpenRouter API key")
-  openai_key=$(masked_input "OpenAI API key")
-  anthropic_key=$(masked_input "Anthropic (Claude) API key")
-  gemini_key=$(masked_input "Google Gemini API key")
-
-  local key_count
-  key_count=$(count_keys "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key")
-  if [[ "$key_count" -eq 0 ]]; then
-    error "At least one API key is required."
-    exit 1
-  fi
-  success "${key_count} key(s) provided"
-
-  # ── Step 6: Summary ───────────────────────────────────────────────────────
-  step_header 6 $steps "Deployment Summary"
+  # ── Step 5: Summary ───────────────────────────────────────────────────────
+  step_header 5 $steps "Deployment Summary"
   summary_table \
     "Cloud"        "Azure" \
     "Region"       "$REGION" \
@@ -118,11 +102,14 @@ azure_wizard() {
     "Disk"         "50 GB Premium_LRS (encrypted)" \
     "Resource Grp" "hermes-rg" \
     "Allowed IP"   "$my_ip" \
-    "Permissions"  "${azure_perm_summary# }" \
-    "API Keys"     "${key_count} provided"
+    "Permissions"  "${azure_perm_summary# }"
 
-  # ── Step 7: Confirm ───────────────────────────────────────────────────────
-  step_header 7 $steps "Deploy"
+  gum style --foreground 245 \
+    "  ℹ  LLM API keys are configured after install via: hermes setup"
+  echo ""
+
+  # ── Step 6: Confirm ───────────────────────────────────────────────────────
+  step_header 6 $steps "Deploy"
   gum confirm "Deploy Hermes Agent to Azure (${REGION})?" || { warn "Aborted."; exit 0; }
 
   # ── Prepare workspace ─────────────────────────────────────────────────────
@@ -207,9 +194,7 @@ EOF
   fi
 
   # ── SSH-based installation ─────────────────────────────────────────────────
-  ssh_wait   "$ip" "azureuser" "$ssh_private_key"
-  ssh_upload_env "$ip" "azureuser" "$ssh_private_key" \
-    "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key"
+  ssh_wait    "$ip" "azureuser" "$ssh_private_key"
   ssh_install "$ip" "azureuser" "$ssh_private_key" \
     "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
 
