@@ -1,5 +1,5 @@
 "use client";
-import { Github, BookOpen, Mic, Code2, ExternalLink } from "lucide-react";
+import { Github, BookOpen, Code2, ExternalLink } from "lucide-react";
 
 const SKILLS = [
   "AI Agents", "Multi-agent Systems", "LLM Orchestration",
@@ -11,17 +11,17 @@ const HIGHLIGHTS = [
   {
     icon: Code2,
     label: "AI Engineer",
-    desc: "Building production AI agent systems and multi-agent orchestration frameworks.",
-  },
-  {
-    icon: Mic,
-    label: "Podcast Host · Debug 人生",
-    desc: "Running a Cantonese tech podcast — breaking down AI, engineering, and industry news for HK developers.",
+    desc: "Building production AI agent systems and multi-agent orchestration frameworks. Specialises in LLM tooling, agentic workflows, and cloud-native AI infrastructure.",
   },
   {
     icon: BookOpen,
-    label: "Technical Writer",
-    desc: "Writing deep-dive articles on distributed systems, AI architecture, and engineering craft on Medium.",
+    label: "Technical Writer · Medium",
+    desc: "Writing deep-dive articles on distributed systems, AI architecture, and engineering craft. Covering topics from Martin Kleppmann's DDIA to hands-on LLM agent patterns.",
+  },
+  {
+    icon: Github,
+    label: "Open Source Builder",
+    desc: "Maintains Hermes Agent Cloud and close-wiki — tools built out of real frustration with painful developer workflows. Everything ships with proper CLI UX and zero magic.",
   },
 ];
 
