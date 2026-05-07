@@ -103,6 +103,15 @@ AWS_INSTANCE_TYPE_LABELS=(
   "t3.2xlarge  — 8 vCPU  32 GB  (High performance)"
 )
 
+# Approximate monthly cost (USD) — On-Demand Linux, us-east-1 reference price
+# Source: aws.amazon.com/ec2/pricing (updated 2025-05)
+declare -A AWS_INSTANCE_COST=(
+  [t3.medium]="~\$30/mo  (On-Demand)  |  ~\$9/mo  (Spot)"
+  [t3.large]="~\$60/mo  (On-Demand)  |  ~\$18/mo (Spot)"
+  [t3.xlarge]="~\$120/mo (On-Demand)  |  ~\$36/mo (Spot)"
+  [t3.2xlarge]="~\$240/mo (On-Demand)  |  ~\$72/mo (Spot)"
+)
+
 # ════════════════════════════════════════════════════════════════════════════
 #  Azure
 # ════════════════════════════════════════════════════════════════════════════
@@ -140,6 +149,15 @@ AZURE_VM_SIZE_LABELS=(
   "Standard_D8s_v3  — 8 vCPU  32 GB  (High performance)"
 )
 
+# Approximate monthly cost (USD) — Pay-as-you-go, East US reference price
+# Source: azure.microsoft.com/en-us/pricing/calculator (updated 2025-05)
+declare -A AZURE_VM_COST=(
+  [Standard_B2s]="~\$35/mo  (Pay-as-you-go)  |  ~\$14/mo (1-yr reserved)"
+  [Standard_D2s_v3]="~\$70/mo  (Pay-as-you-go)  |  ~\$28/mo (1-yr reserved)"
+  [Standard_D4s_v3]="~\$140/mo (Pay-as-you-go)  |  ~\$56/mo (1-yr reserved)"
+  [Standard_D8s_v3]="~\$280/mo (Pay-as-you-go)  |  ~\$112/mo (1-yr reserved)"
+)
+
 # ════════════════════════════════════════════════════════════════════════════
 #  GCP
 # ════════════════════════════════════════════════════════════════════════════
@@ -175,6 +193,15 @@ GCP_MACHINE_TYPE_LABELS=(
   "e2-standard-2  — 2 vCPU  8 GB   (Recommended)"
   "e2-standard-4  — 4 vCPU  16 GB  (Medium)"
   "e2-standard-8  — 8 vCPU  32 GB  (High performance)"
+)
+
+# Approximate monthly cost (USD) — us-central1 reference price (730 hrs/mo)
+# Source: cloud.google.com/compute/vm-instance-pricing (updated 2025-05)
+declare -A GCP_MACHINE_COST=(
+  [e2-medium]="~\$25/mo  (On-Demand)  |  ~\$17/mo (Spot)"
+  [e2-standard-2]="~\$49/mo  (On-Demand)  |  ~\$15/mo (Spot)"
+  [e2-standard-4]="~\$97/mo  (On-Demand)  |  ~\$29/mo (Spot)"
+  [e2-standard-8]="~\$194/mo (On-Demand)  |  ~\$58/mo (Spot)"
 )
 
 # ════════════════════════════════════════════════════════════════════════════

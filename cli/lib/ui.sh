@@ -147,6 +147,35 @@ count_keys() {
   echo "$count"
 }
 
+# ─── Cost hint ──────────────────────────────────────────────────────────────
+# show_cost_hint "aws" "t3.large"
+# show_cost_hint "azure" "Standard_D2s_v3"
+# show_cost_hint "gcp" "e2-standard-2"
+# Reads from the *_COST associative arrays defined in enums.sh.
+show_cost_hint() {
+  local cloud="$1"
+  local instance="$2"
+  local cost=""
+
+  case "$cloud" in
+    aws)   cost="${AWS_INSTANCE_COST[$instance]:-}" ;;
+    azure) cost="${AZURE_VM_COST[$instance]:-}" ;;
+    gcp)   cost="${GCP_MACHINE_COST[$instance]:-}" ;;
+  esac
+
+  [[ -z "$cost" ]] && return 0
+
+  echo ""
+  gum style \
+    --foreground 214 \
+    --bold \
+    "  💰  Estimated cost for ${instance}:  ${cost}"
+  gum style \
+    --foreground 245 \
+    "      Prices are approximate On-Demand rates (excl. storage & egress)."
+  echo ""
+}
+
 # ─── Divider ────────────────────────────────────────────────────────────────
 divider() {
   local label="${1:-}"

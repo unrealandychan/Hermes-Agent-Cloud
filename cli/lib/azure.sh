@@ -34,8 +34,8 @@ azure_wizard() {
   local vm_size
   vm_size="$(echo "$vm_choice" | awk '{print $1}')"
   validate_azure_vm_size "$vm_size"
+  show_cost_hint "azure" "$vm_size"
 
-  # ── Step 3: SSH access ────────────────────────────────────────────────────
   step_header 3 $steps "SSH Access"
   local ssh_pub_key_path
   ssh_pub_key_path=$(plain_input "Path to your SSH public key file" "~/.ssh/id_rsa.pub")

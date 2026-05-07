@@ -44,8 +44,8 @@ gcp_wizard() {
   local machine_type
   machine_type="$(echo "$machine_choice" | awk '{print $1}')"
   validate_gcp_machine_type "$machine_type"
+  show_cost_hint "gcp" "$machine_type"
 
-  # ── Step 3: Network access ────────────────────────────────────────────────
   step_header 3 $steps "Network Access"
   local my_ip
   my_ip=$(curl -sf --max-time 5 "https://api.ipify.org" \

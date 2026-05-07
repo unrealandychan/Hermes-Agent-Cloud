@@ -22,6 +22,7 @@ aws_wizard() {
   local instance_type
   instance_type="$(echo "$instance_choice" | awk '{print $1}')"
   validate_aws_instance_type "$instance_type"
+  show_cost_hint "aws" "$instance_type"
 
   # ── Step 3: SSH access ────────────────────────────────────────────────────
   step_header 3 $steps "SSH Access"
