@@ -1,6 +1,35 @@
 #!/usr/bin/env bash
 # ssh.sh — SSH helpers for post-Terraform installation
 
+# ── Fix SSH key permissions (cross-platform) ─────────────────────────────────
+# On Linux/macOS, chmod 600 is sufficient.
+# On WSL2, keys stored on the Windows filesystem (/mnt/c/...) have NTFS
+# permissions that override Unix chmod. We detect this and use icacls via
+# cmd.exe to lock down the key, then warn the user if that also fails.
+_fix_key_permissions() {
+  local key="$1"
+
+  # If the key is on a Windows-mounted path (WSL2), use icacls
+  if [[ "$key" == /mnt/* ]] && command -v cmd.exe &>/dev/null 2>&1; then
+    # Convert /mnt/c/Users/... → C:\Users\...
+    local win_path
+    win_path="$(wslpath -w "$key" 2>/dev/null || true)"
+    if [[ -n "$win_path" ]]; then
+      local win_user
+      win_user="$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n' || true)"
+      if [[ -n "$win_user" ]]; then
+        cmd.exe /c "icacls \"${win_path}\" /inheritance:r /grant:r \"${win_user}:R\" >NUL 2>&1" || true
+        return
+      fi
+    fi
+    warn "Could not fix key permissions via icacls. If SSH fails, move your key file out of /mnt/c/ (e.g. to ~/keys/) or run: chmod 600 \"$key\""
+    return
+  fi
+
+  # Standard Unix path
+  chmod 600 "$key" 2>/dev/null || warn "Could not chmod 600 $key — SSH may refuse the key"
+}
+
 # ─── Wait for SSH to become available ───────────────────────────────────────
 # ssh_wait <ip> <user> <key_path> [timeout_seconds]
 ssh_wait() {
@@ -13,6 +42,7 @@ ssh_wait() {
 
   # Expand tilde
   key="${key/#\~/$HOME}"
+  _fix_key_permissions "$key"
 
   warn "Waiting for SSH on ${ip} (up to ${timeout}s)..."
   while (( elapsed < timeout )); do
@@ -45,6 +75,7 @@ ssh_upload_env() {
   local gemini_key="$7"
 
   key="${key/#\~/$HOME}"
+  _fix_key_permissions "$key"
 
   # Build .env content — only include lines for non-empty keys.
   # printf is used instead of echo to avoid shell expansion of the values.
@@ -77,6 +108,7 @@ ssh_install() {
   local bootstrap="$4"
 
   key="${key/#\~/$HOME}"
+  _fix_key_permissions "$key"
 
   echo ""
   gum style --foreground 212 --bold "  ─── Installing Hermes Agent via SSH ────────────────────────"
@@ -104,6 +136,7 @@ ssh_update_key() {
   local new_value="$5"
 
   key="${key/#\~/$HOME}"
+  _fix_key_permissions "$key"
 
   warn "Updating ${var_name} on ${user}@${ip} ..."
   # Pass the new value via stdin; only the safe alphanumeric var_name is

@@ -19,6 +19,34 @@ Built with [Charm's `gum`](https://github.com/charmbracelet/gum) for a fully int
 
 ---
 
+## Windows Support
+
+Hermes Agent Cloud is a Bash-based tool and **requires a POSIX shell environment**.
+
+| Environment | Status | Notes |
+|---|---|---|
+| **WSL2** (Ubuntu) | ✅ Fully supported | Recommended for Windows users |
+| **macOS** | ✅ Fully supported | — |
+| **Linux** | ✅ Fully supported | — |
+| Git Bash / MSYS | ❌ Not supported | Missing `sudo`, `chmod`, Bash 4+ |
+| PowerShell / CMD | ❌ Not supported | Not a POSIX shell |
+
+### Setting up WSL2 (Windows)
+
+1. Open **PowerShell as Administrator** and run:
+   ```powershell
+   wsl --install
+   ```
+2. Restart your PC, then open the **Ubuntu** app from the Start menu.
+3. Inside the WSL2 terminal, run the installer:
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/install.sh | bash
+   ```
+
+> **SSH key tip:** Store your cloud SSH private key inside the WSL2 filesystem (`~/keys/mykey.pem`) rather than on the Windows drive (`/mnt/c/...`). Windows NTFS permissions can cause SSH to reject the key with an "unprotected private key file" error even after `chmod 600`.
+
+---
+
 ## Prerequisites
 
 | Tool | Version | Install |

@@ -18,6 +18,36 @@ RESET='\033[0m'
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 
+# ── Windows guard ────────────────────────────────────────────────────────────
+# uname -s on Git Bash returns "MINGW64_NT-*" or "MSYS_NT-*"
+# on Cygwin it returns "CYGWIN_NT-*"
+# We detect all of these and guide the user to WSL2 instead.
+check_windows() {
+  case "$OS" in
+    MINGW*|MSYS*|CYGWIN*)
+      echo ""
+      echo -e "${RED}${BOLD}Windows host detected (Git Bash / MSYS / Cygwin)${RESET}"
+      echo ""
+      echo -e "  Hermes Agent Cloud requires a POSIX shell environment with:"
+      echo -e "  • ${BOLD}sudo${RESET}   (not available in Git Bash)"
+      echo -e "  • ${BOLD}ssh${RESET}    (OpenSSH with Unix permission enforcement)"
+      echo -e "  • ${BOLD}bash 4+${RESET} with proper LF line endings"
+      echo ""
+      echo -e "  ${YELLOW}${BOLD}Recommended: use WSL2 (Windows Subsystem for Linux)${RESET}"
+      echo ""
+      echo -e "  1. Open PowerShell as Administrator and run:"
+      echo -e "     ${BOLD}wsl --install${RESET}"
+      echo -e "  2. Restart your PC, then open the Ubuntu app."
+      echo -e "  3. Inside WSL2, re-run the installer:"
+      echo -e "     ${BOLD}curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/install.sh | bash${RESET}"
+      echo ""
+      echo -e "  WSL2 docs: ${DIM}https://learn.microsoft.com/windows/wsl/install${RESET}"
+      echo ""
+      exit 1
+      ;;
+  esac
+}
+
 banner() {
   echo ""
   echo -e "${BOLD}Hermes Agent Cloud installer — v${HERMES_DEPLOY_VERSION}${RESET}"
@@ -301,6 +331,7 @@ install_hermes_deploy() {
 # ── Main ────────────────────────────────────────────────────────────────────
 main() {
   banner
+  check_windows
   require_sudo
 
   install_bash
