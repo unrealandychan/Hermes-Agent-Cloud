@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # enums.sh — All enumerated values and validation helpers for Hermes Agent Cloud
 #
+# Arrays defined here are sourced and consumed by other lib/*.sh files and
+# hermes-deploy; shellcheck cannot follow cross-file references via 'source'.
+# shellcheck disable=SC2034
+#
 # HOW TO EXTEND
 # ─────────────
 # Add a cloud    : append to VALID_CLOUDS + CLOUD_DISPLAY_LABELS, create lib/<cloud>.sh,

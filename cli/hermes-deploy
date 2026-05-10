@@ -34,7 +34,8 @@ HERMES_DEPLOY_DIR="$(resolve_script_dir)"
 HERMES_DEPLOY_HOME="${HOME}/.hermes-agent-cloud"
 
 # ─── Source libraries ───────────────────────────────────────────────────────
-# shellcheck source=lib/enums.sh  — must be first; other libs depend on enum arrays
+# shellcheck source=lib/enums.sh
+# Must be sourced first; other libs depend on enum arrays.
 source "${HERMES_DEPLOY_DIR}/lib/enums.sh"
 # shellcheck source=lib/ui.sh
 source "${HERMES_DEPLOY_DIR}/lib/ui.sh"
@@ -59,9 +60,9 @@ source "${HERMES_DEPLOY_DIR}/lib/profile.sh"
 
 # ─── Globals ────────────────────────────────────────────────────────────────
 CLOUD=""
-REGION=""
-DRY_RUN=false
-NO_COLOR=false
+export REGION=""
+export DRY_RUN=false
+export NO_COLOR=false
 SUBCOMMAND=""
 REMAINING_ARGS=()
 
@@ -70,7 +71,7 @@ parse_flags() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --cloud)    CLOUD="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; validate_cloud "$CLOUD"; shift 2 ;;
-      --region)   REGION="$2";  shift 2 ;;
+      --region)      REGION="$2"; shift 2 ;;
       --dry-run)  DRY_RUN=true; shift   ;;
       --no-color) NO_COLOR=true; shift  ;;
       --help|-h)  cmd_help; exit 0      ;;

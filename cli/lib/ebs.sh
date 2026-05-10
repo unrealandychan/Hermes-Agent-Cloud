@@ -21,7 +21,7 @@ _ebs_load_config() {
   REGION="$(config_get "region")"
   EBS_VOLUME_ID="$(config_get "ebs_volume_id" 2>/dev/null || echo "")"
   INSTANCE_ID="$(config_get "instance_id" 2>/dev/null || echo "")"
-  SSH_KEY="$(config_get "ssh_key_path" 2>/dev/null || echo "~/.ssh/id_rsa")"
+  SSH_KEY="$(config_get "ssh_key_path" 2>/dev/null || echo "$HOME/.ssh/id_rsa")"
   PUBLIC_IP="$(config_get "public_ip" 2>/dev/null || echo "")"
 
   if [[ -z "$EBS_VOLUME_ID" ]]; then

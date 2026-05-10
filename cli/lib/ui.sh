@@ -2,6 +2,7 @@
 # ui.sh — All TUI helpers for Hermes Agent Cloud (requires gum by Charm)
 
 # ─── ANSI fallbacks (used before gum is confirmed available) ────────────────
+# shellcheck disable=SC2034  # these vars are sourced and used by install.sh
 RED='\\033[0;31m'
 GREEN='\\033[0;32m'
 YELLOW='\\033[1;33m'

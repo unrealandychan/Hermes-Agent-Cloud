@@ -11,8 +11,8 @@ set -euo pipefail
 # ── Argument parsing ────────────────────────────────────────────────────────
 HERMES_USER="ubuntu"
 HERMES_PROFILE="default"
-WEB_PORT="9119"
-API_PORT="8080"
+export WEB_PORT="9119"
+export API_PORT="8080"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -39,10 +39,10 @@ SERVICE_NAME="hermes-${HERMES_PROFILE}"
 LOG_FILE="/var/log/hermes-bootstrap-${HERMES_PROFILE}.log"
 LOG_TAG="hermes-bootstrap[${HERMES_PROFILE}]"
 
-log()  { echo "[$LOG_TAG] $*" | tee -a $LOG_FILE; }
-fail() { echo "[$LOG_TAG] ERROR: $*" | tee -a $LOG_FILE >&2; exit 1; }
+log()  { echo "[$LOG_TAG] $*" | tee -a "$LOG_FILE"; }
+fail() { echo "[$LOG_TAG] ERROR: $*" | tee -a "$LOG_FILE" >&2; exit 1; }
 
-exec > >(tee -a $LOG_FILE) 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
 log "Starting Hermes bootstrap"
 
 [[ -f "$HERMES_ENV" ]] || fail "$HERMES_ENV not found — API keys must be deployed before running bootstrap"
@@ -58,12 +58,12 @@ log "Step 2/4: Installing Docker"
 if ! command -v docker &>/dev/null; then
   curl -fsSL https://get.docker.com | bash
 fi
-usermod -aG docker $HERMES_USER
+usermod -aG docker "$HERMES_USER"
 log "  Docker $(docker --version)"
 
 # ── 3. Install Hermes Agent (always pull latest) ─────────────────────────────
 log "Step 3/4: Installing Hermes Agent (latest)"
-sudo -u $HERMES_USER bash -c \
+sudo -u "$HERMES_USER" bash -c \
   'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'
 
 # Locate the hermes binary (installer may put it in ~/.local/bin or /usr/local/bin)
@@ -72,8 +72,8 @@ HERMES_BIN=$(sudo -u "$HERMES_USER" bash -c \
 log "  Hermes binary: $HERMES_BIN"
 
 # Write Hermes config
-mkdir -p $HERMES_HOME
-cat > $HERMES_CONFIG <<'YAML'
+mkdir -p "$HERMES_HOME"
+cat > "$HERMES_CONFIG" <<'YAML'
 terminal:
   backend: docker
   container_cpu: 1
@@ -95,7 +95,7 @@ web:
   enabled: true
   port: ${WEB_PORT}
 YAML
-chown -R $HERMES_USER:$HERMES_USER $HERMES_HOME
+chown -R "$HERMES_USER":"$HERMES_USER" "$HERMES_HOME"
 log "  Hermes config written to $HERMES_CONFIG"
 
 # ── 4. Register hermes-gateway systemd service ───────────────────────────────

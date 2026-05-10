@@ -38,8 +38,8 @@ azure_wizard() {
 
   step_header 3 $steps "SSH Access"
   local ssh_pub_key_path
-  ssh_pub_key_path=$(plain_input "Path to your SSH public key file" "~/.ssh/id_rsa.pub")
-  [[ -z "$ssh_pub_key_path" ]] && ssh_pub_key_path="~/.ssh/id_rsa.pub"
+  ssh_pub_key_path=$(plain_input "Path to your SSH public key file" "$HOME/.ssh/id_rsa.pub")
+  [[ -z "$ssh_pub_key_path" ]] && ssh_pub_key_path="$HOME/.ssh/id_rsa.pub"
   ssh_pub_key_path="${ssh_pub_key_path/#\~/$HOME}"
 
   if [[ ! -f "$ssh_pub_key_path" ]]; then
@@ -76,14 +76,14 @@ azure_wizard() {
     "storage+sql     — Storage + SQL" \
     "full       — Storage + Billing + SQL")
 
-  local azure_enable_storage=false azure_enable_billing=false azure_enable_sql=false
+    local azure_enable_storage=false azure_enable_billing=false azure_enable_sql=false
   case "$azure_perm_choice" in
-    storage*)       azure_enable_storage=true ;;
-    billing*)       azure_enable_billing=true ;;
-    sql*)           azure_enable_sql=true ;;
+    billing*)         azure_enable_billing=true ;;
+    sql*)             azure_enable_sql=true ;;
     storage+billing*) azure_enable_storage=true; azure_enable_billing=true ;;
-    storage+sql*)   azure_enable_storage=true; azure_enable_sql=true ;;
-    full*)          azure_enable_storage=true; azure_enable_billing=true; azure_enable_sql=true ;;
+    storage+sql*)     azure_enable_storage=true; azure_enable_sql=true ;;
+    full*)            azure_enable_storage=true; azure_enable_billing=true; azure_enable_sql=true ;;
+    storage*)         azure_enable_storage=true ;;
   esac
 
   local azure_perm_summary=""

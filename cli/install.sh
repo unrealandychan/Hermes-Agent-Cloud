@@ -136,7 +136,6 @@ install_gum() {
         sudo apt-get install -y -qq gum
       else
         # Direct binary download
-        local deb="gum_${GUM_VERSION}_linux_${arch_label}.tar.gz"
         curl -fsSLo /tmp/gum.tar.gz \
           "https://github.com/charmbracelet/gum/releases/download/v${GUM_VERSION}/gum_${GUM_VERSION}_Linux_${arch_label}.tar.gz"
         tar -xzf /tmp/gum.tar.gz -C /tmp gum
@@ -261,7 +260,7 @@ install_hermes_deploy() {
     # Download from GitHub releases
     local tmp_dir
     tmp_dir=$(mktemp -d)
-    trap "rm -rf $tmp_dir" EXIT
+    trap 'rm -rf '"$tmp_dir" EXIT
 
     local archive_url="https://github.com/unrealandychan/Hermes-Agent-Cloud/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
     info "Downloading from ${archive_url}..."
@@ -291,7 +290,7 @@ install_hermes_deploy() {
 
       local tmp_main_dir
       tmp_main_dir=$(mktemp -d)
-      trap "rm -rf $tmp_dir $tmp_main_dir" EXIT
+      trap 'rm -rf '"$tmp_dir $tmp_main_dir" EXIT
 
       curl -fsSL "$main_archive_url" | tar -xz -C "$tmp_main_dir" --strip-components=1
 

@@ -34,8 +34,8 @@ aws_wizard() {
   fi
 
   local ssh_key_path
-  ssh_key_path=$(plain_input "Path to local private key file" "~/.ssh/id_rsa")
-  [[ -z "$ssh_key_path" ]] && ssh_key_path="~/.ssh/id_rsa"
+  ssh_key_path=$(plain_input "Path to local private key file" "$HOME/.ssh/id_rsa")
+  [[ -z "$ssh_key_path" ]] && ssh_key_path="$HOME/.ssh/id_rsa"
 
   # Auto-detect deployer IP for security group lockdown
   local my_ip

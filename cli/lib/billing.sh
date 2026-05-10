@@ -34,9 +34,6 @@ billing_cmd() {
 
 # ─── AWS billing ─────────────────────────────────────────────────────────────
 billing_aws() {
-  local region
-  region=$(config_get "region" 2>/dev/null || echo "us-east-1")
-
   gum style --foreground 212 --bold "  AWS Cost Summary"
   echo ""
 
@@ -79,7 +76,7 @@ billing_aws() {
       return 1
     }
 
-  local total_amount currency
+    local total_amount
   total_amount=$(echo "$total_json" | \
     python3 -c "
 import json,sys
@@ -157,9 +154,6 @@ for b in json.load(sys.stdin).get('Budgets',[]):
 
 # ─── Azure billing ────────────────────────────────────────────────────────────
 billing_azure() {
-  local rg
-  rg=$(config_get "resource_group" 2>/dev/null || echo "hermes-rg")
-
   gum style --foreground 212 --bold "  Azure Cost Summary"
   echo ""
 

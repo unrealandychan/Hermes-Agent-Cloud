@@ -87,12 +87,12 @@ gcp_wizard() {
 
   local gcp_enable_storage=false gcp_enable_billing=false gcp_enable_sql=false
   case "$gcp_perm_choice" in
-    storage*)          gcp_enable_storage=true ;;
     billing*)          gcp_enable_billing=true ;;
     cloudsql*)         gcp_enable_sql=true ;;
     storage+billing*)  gcp_enable_storage=true; gcp_enable_billing=true ;;
     storage+sql*)      gcp_enable_storage=true; gcp_enable_sql=true ;;
     full*)             gcp_enable_storage=true; gcp_enable_billing=true; gcp_enable_sql=true ;;
+    storage*)          gcp_enable_storage=true ;;
   esac
 
   local gcp_perm_summary=""
