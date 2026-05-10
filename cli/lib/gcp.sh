@@ -5,7 +5,7 @@
 
 # ─── Wizard ─────────────────────────────────────────────────────────────────
 gcp_wizard() {
-  local steps=6
+  local steps=7
   preflight_check_cloud "gcp"
 
   # Ensure authenticated
@@ -36,23 +36,21 @@ gcp_wizard() {
   REGION="$(echo "$region_choice" | awk '{print $1}')"
   validate_gcp_region "$REGION"
 
-  # Query available zones — not every region has a zone "-a"
-  local available_zones
-  available_zones=$(gcloud compute zones list \
-    --filter="region:${REGION}" \
-    --project "${project_id}" \
-    --format="value(name)" 2>/dev/null | sort)
+  # ── Step 2: Zone selection ────────────────────────────────────────────────
+  step_header 2 $steps "GCP Zone"
+  local zones zone_list zone
+  zone_list=$(gcloud compute zones list --filter="region:($REGION)" --format="value(name)" 2>/dev/null || echo "")
 
-  if [[ -z "$available_zones" ]]; then
-    error "No zones found for region ${REGION}. Check the region name and project permissions."
-    exit 1
+  if [[ -n "$zone_list" ]]; then
+    IFS=$'\n' read -rd '' -a zones <<< "$zone_list"
+    zone=$(choose_one "Select deployment zone" "${zones[@]}")
+  else
+    zone="${REGION}-a"
+    warn "Could not fetch zones from GCP. Falling back to default: ${zone}"
   fi
 
-  local zone
-  zone=$(echo "$available_zones" | head -1)
-
-  # ── Step 2: Machine type ──────────────────────────────────────────────────
-  step_header 2 $steps "Machine Type"
+  # ── Step 3: Machine type ──────────────────────────────────────────────────
+  step_header 3 $steps "Machine Type"
   local machine_choice
   machine_choice=$(choose_one "Select machine type" "${GCP_MACHINE_TYPE_LABELS[@]}")
   local machine_type
@@ -60,7 +58,8 @@ gcp_wizard() {
   validate_gcp_machine_type "$machine_type"
   show_cost_hint "gcp" "$machine_type"
 
-  step_header 3 $steps "Network Access"
+  # ── Step 4: Network access ────────────────────────────────────────────────
+  step_header 4 $steps "Network Access"
   local my_ip
   my_ip=$(curl -sf --max-time 5 "https://api.ipify.org" \
             || curl -sf --max-time 5 "https://ifconfig.me" \
@@ -68,8 +67,8 @@ gcp_wizard() {
   local allowed_cidr="${my_ip}/32"
   warn "SSH / gateway access will be locked to your current IP: ${my_ip}"
 
-  # ── Step 4: Permission Profile ────────────────────────────────────────────
-  step_header 4 $steps "Permission Profile  (GCP IAM roles for this instance)"
+  # ── Step 5: Permission Profile ────────────────────────────────────────────
+  step_header 5 $steps "Permission Profile  (GCP IAM roles for this instance)"
 
   gum style --foreground 245 \
     "Select which GCP services Hermes Agent should be able to operate." \
@@ -104,7 +103,8 @@ gcp_wizard() {
   success "Selected:${gcp_perm_summary}"
 
   # ── Step 5: Summary ───────────────────────────────────────────────────────
-  step_header 5 $steps "Deployment Summary"
+  # ── Step 6: Deployment Summary ────────────────────────────────────────────
+  step_header 6 $steps "Deployment Summary"
   summary_table \
     "Cloud"         "GCP" \
     "Project"       "$project_id" \
@@ -119,7 +119,8 @@ gcp_wizard() {
   echo ""
 
   # ── Step 6: Confirm ───────────────────────────────────────────────────────
-  step_header 6 $steps "Deploy"
+  # ── Step 7: Confirm & Deploy ──────────────────────────────────────────────
+  step_header 7 $steps "Deploy"
   gum confirm "Deploy Hermes Agent to GCP (${REGION})?" || { warn "Aborted."; exit 0; }
 
   # ── Prepare workspace ─────────────────────────────────────────────────────
