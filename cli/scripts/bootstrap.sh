@@ -100,7 +100,7 @@ log "  Hermes config written to $HERMES_CONFIG"
 
 # ── 4. Register hermes-gateway systemd service ───────────────────────────────
 log "Step 4/4: Registering systemd service (${SERVICE_NAME})"
-cat > /etc/systemd/system/${SERVICE_NAME}.service <<EOF
+cat > "/etc/systemd/system/${SERVICE_NAME}.service" <<EOF
 [Unit]
 Description=Hermes Agent Gateway
 Documentation=https://hermes-agent.nousresearch.com

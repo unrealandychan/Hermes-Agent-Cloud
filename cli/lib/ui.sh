@@ -53,11 +53,11 @@ spinner() {
   local title="$1"; shift
   local log_file
   log_file=$(mktemp /tmp/hermes-deploy-XXXXXX.log)
-  if ! HERMES_LOG="$log_file" gum spin \
+  if ! gum spin \
     --spinner dot \
     --spinner.foreground 212 \
     --title "  $title" \
-    -- bash -c '"$@" >"$HERMES_LOG" 2>&1' _ "$@"; then
+    -- bash -c '"$@" >'"\"$log_file\""' 2>&1' _ "$@"; then
     local exit_code
     exit_code=$?
     error "Command failed (exit ${exit_code}). Full output:"
