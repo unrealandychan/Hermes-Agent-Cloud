@@ -35,7 +35,21 @@ gcp_wizard() {
   region_choice=$(choose_one "Select deployment region" "${GCP_REGION_LABELS[@]}")
   REGION="$(echo "$region_choice" | awk '{print $1}')"
   validate_gcp_region "$REGION"
-  local zone="${REGION}-a"
+
+  # Query available zones — not every region has a zone "-a"
+  local available_zones
+  available_zones=$(gcloud compute zones list \
+    --filter="region:${REGION}" \
+    --project "${project_id}" \
+    --format="value(name)" 2>/dev/null | sort)
+
+  if [[ -z "$available_zones" ]]; then
+    error "No zones found for region ${REGION}. Check the region name and project permissions."
+    exit 1
+  fi
+
+  local zone
+  zone=$(echo "$available_zones" | head -1)
 
   # ── Step 2: Machine type ──────────────────────────────────────────────────
   step_header 2 $steps "Machine Type"
