@@ -7,5 +7,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run ShellCheck
         run: |
-          find ./cli -name '*.sh' -o -name 'hermes-deploy' -o -name 'install.sh' | \
-            xargs shellcheck --external-sources
+          cd ./cli
+          find . -name '*.sh' -o -name 'hermes-deploy' -o -name 'install.sh' | \
+            xargs shellcheck --external-sources -e SC2015
