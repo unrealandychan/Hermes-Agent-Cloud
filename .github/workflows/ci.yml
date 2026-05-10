@@ -6,7 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          scandir: './cli'
-          shellcheck_options: '--external-sources'
+        run: |
+          find ./cli -name '*.sh' -o -name 'hermes-deploy' -o -name 'install.sh' | \
+            xargs shellcheck --external-sources
