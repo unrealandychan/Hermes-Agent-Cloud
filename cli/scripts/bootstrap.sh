@@ -8,6 +8,10 @@
 # Usage: bootstrap.sh [--user <ssh-user>] [--profile <profile-name>] [--web-port <port>] [--api-port <port>]
 set -euo pipefail
 
+# ── Version pinning ────────────────────────────────────────────────────────
+# Allow override via environment; falls back to "latest"
+HERMES_VERSION="${HERMES_AGENT_VERSION:-latest}"
+
 # ── Argument parsing ────────────────────────────────────────────────────────
 HERMES_USER="ubuntu"
 HERMES_PROFILE="default"
@@ -61,10 +65,15 @@ fi
 usermod -aG docker "$HERMES_USER"
 log "  Docker $(docker --version)"
 
-# ── 3. Install Hermes Agent (always pull latest) ─────────────────────────────
-log "Step 3/4: Installing Hermes Agent (latest)"
-sudo -u "$HERMES_USER" bash -c \
-  'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'
+# ── 3. Install Hermes Agent ───────────────────────────────────────────────────
+log "Step 3/4: Installing Hermes Agent (version: ${HERMES_VERSION})"
+if [[ "$HERMES_VERSION" == "latest" ]]; then
+  sudo -u "$HERMES_USER" bash -c \
+    'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'
+else
+  sudo -u "$HERMES_USER" bash -c \
+    "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/${HERMES_VERSION}/scripts/install.sh | bash"
+fi
 
 # Locate the hermes binary (installer may put it in ~/.local/bin or /usr/local/bin)
 HERMES_BIN=$(sudo -u "$HERMES_USER" bash -c \
@@ -73,7 +82,7 @@ log "  Hermes binary: $HERMES_BIN"
 
 # Write Hermes config
 mkdir -p "$HERMES_HOME"
-cat > "$HERMES_CONFIG" <<'YAML'
+cat > "$HERMES_CONFIG" <<YAML
 terminal:
   backend: docker
   container_cpu: 1

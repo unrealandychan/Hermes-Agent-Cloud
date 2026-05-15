@@ -115,6 +115,10 @@ Hermes-Agent-Cloud/
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/install.sh | bash
+
+> **Security note:** Always verify the script before running it in production.
+> SHA-256 checksums for each release are published on the [GitHub Releases](https://github.com/unrealandychan/Hermes-Agent-Cloud/releases) page.
+> To verify: `curl -sSL <url> | sha256sum` and compare against the published checksum.
 ```
 
 Or manually:
