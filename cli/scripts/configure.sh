@@ -5,7 +5,19 @@
 
 set -euo pipefail
 
-HERMES_HOME="$HOME/.hermes"
+# ── Profile support ────────────────────────────────────────────────────────
+# Usage: configure.sh [<profile-name>]
+# Defaults to "default" for backward compatibility.
+HERMES_PROFILE="${1:-default}"
+
+if [[ "$HERMES_PROFILE" == "default" ]]; then
+  HERMES_HOME="$HOME/.hermes"
+  SERVICE_NAME="hermes-gateway"
+else
+  HERMES_HOME="$HOME/.hermes-profiles/${HERMES_PROFILE}"
+  SERVICE_NAME="hermes-${HERMES_PROFILE}"
+fi
+
 HERMES_ENV="$HERMES_HOME/.env"
 
 # ── Colours ────────────────────────────────────────────────────────────────
@@ -90,15 +102,15 @@ fi
 
 # ── 5. systemd service ─────────────────────────────────────────────────────
 div "5.  hermes-gateway service"
-if systemctl is-active --quiet hermes-gateway 2>/dev/null; then
-  ok "hermes-gateway is running"
-  systemctl status hermes-gateway --no-pager -l 2>/dev/null \
+if systemctl is-active --quiet "${SERVICE_NAME}" 2>/dev/null; then
+  ok "${SERVICE_NAME} is running"
+  systemctl status "${SERVICE_NAME}" --no-pager -l 2>/dev/null \
     | grep -E "Active:|Main PID:" \
     | sed 's/^/       /'
 else
-  fail "hermes-gateway is NOT running"
-  warn "Start it:    sudo systemctl start hermes-gateway"
-  warn "View logs:   journalctl -u hermes-gateway -n 50 --no-pager"
+  fail "${SERVICE_NAME} is NOT running"
+  warn "Start it:    sudo systemctl start ${SERVICE_NAME}"
+  warn "View logs:   journalctl -u ${SERVICE_NAME} -n 50 --no-pager"
 fi
 
 # ── 6. hermes doctor ───────────────────────────────────────────────────────

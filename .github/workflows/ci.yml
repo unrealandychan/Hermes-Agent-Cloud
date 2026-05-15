@@ -1,12 +1,35 @@
-name: Lint
+name: CI
 on: [push, pull_request]
+
 jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run ShellCheck
-        run: |
-          cd ./cli
-          find . -name '*.sh' -o -name 'hermes-deploy' -o -name 'install.sh' | \
-            xargs shellcheck --external-sources -e SC2015
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './cli'
+          severity: warning
+
+  terraform-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cloud: [aws, azure, gcp]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: cd cli/terraform/${{ matrix.cloud }} && terraform init -backend=false && terraform validate
+
+  website-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci && npm run build

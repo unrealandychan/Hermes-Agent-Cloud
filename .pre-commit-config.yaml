@@ -1,15 +1,11 @@
 # ──────────────────────────────────────────────────────────────────────────────
-#  pre-commit configuration — plug-and-play multi-language hooks
-#  Drop in project root as .pre-commit-config.yaml
+#  pre-commit configuration — Bash + TypeScript project
 #
 #  Install pre-commit:  pip install pre-commit
 #  Install hooks once:  pre-commit install
 #  Run manually:        pre-commit run --all-files
 #  Update hooks:        pre-commit autoupdate
 # ──────────────────────────────────────────────────────────────────────────────
-
-default_language_version:
-  python: python3.11
 
 repos:
 
@@ -29,31 +25,12 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
 
-  # ── Python ────────────────────────────────────────────────────────────────────
-  # Requires: pip install ruff mypy bandit
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+  # ── Shell (Bash) ──────────────────────────────────────────────────────────────
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
     hooks:
-      - id: ruff
-        args: ["--fix"]
-        types_or: [python, pyi]
-      - id: ruff-format
-        types_or: [python, pyi]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
-    hooks:
-      - id: mypy
-        additional_dependencies: ["types-all"]
-        pass_filenames: false
-        args: ["--config-file=pyproject.toml"]
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
-    hooks:
-      - id: bandit
-        args: ["-c", "pyproject.toml"]
-        types: [python]
+      - id: shellcheck
+        args: ["--external-sources", "-e", "SC2015"]
 
   # ── TypeScript / JavaScript ───────────────────────────────────────────────────
   # Requires: npm install -D eslint prettier @typescript-eslint/parser
@@ -76,46 +53,6 @@ repos:
     hooks:
       - id: prettier
         types_or: [ts, tsx, javascript, jsx, json, yaml, markdown]
-
-  # ── Go ────────────────────────────────────────────────────────────────────────
-  # Requires: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
-    hooks:
-      - id: go-fmt
-      - id: go-vet
-      - id: go-unit-tests
-
-  - repo: local
-    hooks:
-      - id: golangci-lint
-        name: golangci-lint
-        entry: golangci-lint run --fix
-        language: system
-        types: [go]
-        pass_filenames: false
-
-  # ── Java ──────────────────────────────────────────────────────────────────────
-  # Requires: mvn or gradle available in PATH
-  - repo: local
-    hooks:
-      - id: checkstyle
-        name: checkstyle
-        entry: mvn checkstyle:check -q
-        language: system
-        types: [java]
-        pass_filenames: false
-
-  # ── C# / .NET ─────────────────────────────────────────────────────────────────
-  # Requires: dotnet SDK installed
-  - repo: local
-    hooks:
-      - id: dotnet-format
-        name: dotnet format
-        entry: dotnet format --verify-no-changes
-        language: system
-        types: [c#]
-        pass_filenames: false
 
   # ── Secret scanning ───────────────────────────────────────────────────────────
   - repo: https://github.com/Yelp/detect-secrets
