@@ -23,7 +23,7 @@ export default function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 badge badge-amber mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
-              v1.3.0 · EBS Persistent Storage · Open Source
+              v1.4.0 · EBS Persistent Storage · Open Source
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 tracking-tight">

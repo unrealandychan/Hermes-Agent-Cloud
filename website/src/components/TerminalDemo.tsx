@@ -9,7 +9,7 @@ const LINES = [
   { delay: 800,  text: "  ███████║█████╗  ██████╔╝██╔████╔██║█████╗  ███████╗", type: "banner" },
   { delay: 850,  text: "  ██╔══██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══╝  ╚════██║", type: "banner" },
   { delay: 900,  text: "  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝", type: "banner" },
-  { delay: 950,  text: "  AGENT CLOUD  v1.3.0  ·  AWS · Azure · GCP",  type: "dim"    },
+  { delay: 950,  text: "  AGENT CLOUD  v1.4.0  ·  AWS · Azure · GCP",  type: "dim"    },
   { delay: 1100, text: "",                                             type: "blank" },
   { delay: 1300, text: "  [1/7] Cloud provider   →  AWS",              type: "step"  },
   { delay: 1700, text: "  [2/7] AWS Region       →  ap-east-1 (Hong Kong)", type: "step" },
