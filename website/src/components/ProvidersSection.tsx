@@ -42,6 +42,26 @@ const PROVIDERS = [
     models: ["gemini-3.1-flash", "gemini-3.1-pro", "gemini-2.5-pro"],
     badge: null,
   },
+  {
+    id: "novita",
+    name: "NovitaAI",
+    tagline: "Fast inference, low cost",
+    color: "#818cf8",
+    envVar: "NOVITA_API_KEY",
+    secretPath: "/hermes/novita_api_key",
+    models: ["llama-3.3-70b", "qwen-2.5-72b", "deepseek-v3"],
+    badge: "New",
+  },
+  {
+    id: "xai",
+    name: "xAI SuperGrok",
+    tagline: "Grok 3 · SuperGrok tier",
+    color: "#e879f9",
+    envVar: "XAI_API_KEY",
+    secretPath: "/hermes/xai_api_key",
+    models: ["grok-3", "grok-3-mini", "grok-2"],
+    badge: "New",
+  },
 ];
 
 export default function ProvidersSection() {
@@ -62,7 +82,7 @@ export default function ProvidersSection() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {PROVIDERS.map(p => (
             <div
               key={p.id}
