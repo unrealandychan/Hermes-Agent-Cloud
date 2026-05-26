@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import WhatsNew from "@/components/WhatsNew";
 import FeaturesOverview from "@/components/FeaturesOverview";
 import CloudsSection from "@/components/CloudsSection";
 import FeatureGrid from "@/components/FeatureGrid";
@@ -15,6 +16,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <WhatsNew />
         <FeaturesOverview />
         <CloudsSection />
         <FeatureGrid />

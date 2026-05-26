@@ -26,6 +26,7 @@ export default function Navbar() {
           <a href="#install" className="hover:text-white transition-colors">Install</a>
           <a href="#about" className="hover:text-white transition-colors"
             style={{ color: "var(--amber)" }}>About</a>
+          <Link href="/changelog" className="hover:text-white transition-colors">Changelog</Link>
         </nav>
 
         {/* CTA */}
