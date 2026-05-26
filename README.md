@@ -121,6 +121,11 @@ curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/ma
 > To verify: `curl -sSL <url> | sha256sum` and compare against the published checksum.
 ```
 
+```bash
+# PyPI (new in v0.14.0 — single machine, no infra needed)
+pip install hermes-agent && hermes
+```
+
 Or manually:
 
 ```bash
@@ -246,12 +251,28 @@ http://<instance-ip>:9119
 | OpenAI | `OPENAI_API_KEY` | GPT-5, GPT-5.4, GPT-4.1, o3 |
 | Anthropic | `ANTHROPIC_API_KEY` | Claude 4.6 Sonnet, Claude 4.6 Haiku |
 | Google Gemini | `GEMINI_API_KEY` | Gemini 3.1 Flash / Pro, Gemini 2.5 Pro |
+| NovitaAI | `NOVITA_API_KEY` | Llama, Qwen, DeepSeek hosting |
+| xAI SuperGrok | `XAI_API_KEY` | No API key needed with SuperGrok OAuth; 1M context |
 
 At least one provider required. Mixed-provider setups fully supported.
 
 ---
 
-## Extending
+## New in v0.14.0
+
+| Command | Description |
+|---------|-------------|
+| `hermes proxy` | Start OpenAI-compatible local proxy — lets Codex CLI, Aider, Cline use your Claude Pro/ChatGPT Pro/SuperGrok subscription |
+| `hermes setup --portal` | One-command Nous Portal setup wizard |
+| `hermes web` | Launch built-in web dashboard (FastAPI + React SPA) |
+| `hermes claw migrate` | Migrate from OpenClaw |
+
+**Flags:**
+- `--yolo` / `HERMES_YOLO_MODE=1` — bypass all approval prompts (useful for CI/non-interactive deployments)
+
+**Windows Beta:** Hermes Agent v0.14.0 runs natively on Windows (cmd.exe / PowerShell) without WSL.
+
+---
 
 All valid option values live in a single file — **`cli/lib/enums.sh`**.
 To add a new cloud region, instance type, or LLM provider, edit only that file.
