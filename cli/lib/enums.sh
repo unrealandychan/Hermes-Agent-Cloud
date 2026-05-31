@@ -36,7 +36,7 @@ CLOUD_DISPLAY_LABELS=(
 #  API key providers
 # ════════════════════════════════════════════════════════════════════════════
 # Ordered list — controls wizard display order.  Add new providers here.
-API_PROVIDER_ORDER=("openrouter" "openai" "anthropic" "gemini")
+API_PROVIDER_ORDER=("openrouter" "openai" "anthropic" "gemini" "novita" "xai")
 
 # Provider key → human-readable label
 declare -A API_PROVIDER_LABELS=(
@@ -44,6 +44,8 @@ declare -A API_PROVIDER_LABELS=(
   [openai]="OpenAI"
   [anthropic]="Anthropic (Claude)"
   [gemini]="Google Gemini"
+  [novita]="NovitaAI"
+  [xai]="xAI (SuperGrok)"
 )
 
 # Provider key → env var written into ~/.hermes/.env
@@ -52,6 +54,8 @@ declare -A API_PROVIDER_ENV_VARS=(
   [openai]="OPENAI_API_KEY"
   [anthropic]="ANTHROPIC_API_KEY"
   [gemini]="GEMINI_API_KEY"
+  [novita]="NOVITA_API_KEY"
+  [xai]="XAI_API_KEY"
 )
 
 # Provider key → AWS SSM Parameter Store path
@@ -60,6 +64,8 @@ declare -A API_PROVIDER_AWS_SSM=(
   [openai]="/hermes/openai_api_key"
   [anthropic]="/hermes/anthropic_api_key"
   [gemini]="/hermes/gemini_api_key"
+  [novita]="/hermes/novita_api_key"
+  [xai]="/hermes/xai_api_key"
 )
 
 # Provider key → Azure Key Vault secret name
@@ -68,6 +74,8 @@ declare -A API_PROVIDER_AZURE_KV=(
   [openai]="openai-api-key"
   [anthropic]="anthropic-api-key"
   [gemini]="gemini-api-key"
+  [novita]="novita-api-key"
+  [xai]="xai-api-key"
 )
 
 # Provider key → GCP Secret Manager secret name
@@ -76,6 +84,8 @@ declare -A API_PROVIDER_GCP_SECRET=(
   [openai]="hermes-openai-api-key"
   [anthropic]="hermes-anthropic-api-key"
   [gemini]="hermes-gemini-api-key"
+  [novita]="hermes-novita-api-key"
+  [xai]="hermes-xai-api-key"
 )
 
 # ════════════════════════════════════════════════════════════════════════════

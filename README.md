@@ -13,7 +13,7 @@
 
 # Hermes Agent Cloud
 
-> One command. Three clouds. Four LLM providers.
+> One command. Three clouds. Six LLM providers.
 > Deploy the [Hermes Agent](https://github.com/NousResearch/hermes) to AWS, Azure, or GCP with a beautiful wizard-first CLI — zero plaintext secrets, zero manual infra wiring.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-amber.svg)](LICENSE)
@@ -122,9 +122,12 @@ curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/ma
 ```
 
 ```bash
-# PyPI (new in v0.14.0 — single machine, no infra needed)
+# PyPI — always installs the latest version (recommended)
 pip install hermes-agent && hermes
 ```
+
+> ⚠️ **Homebrew note:** `brew install hermes-agent` may lag behind the latest release by one or more versions.
+> Use `pip install --upgrade hermes-agent` or the one-liner above to ensure you have the newest version.
 
 Or manually:
 
@@ -250,13 +253,26 @@ http://<instance-ip>:9119
 | OpenRouter | `OPENROUTER_API_KEY` | 600+ models, recommended |
 | OpenAI | `OPENAI_API_KEY` | GPT-5, GPT-5.4, GPT-4.1, o3 |
 | Anthropic | `ANTHROPIC_API_KEY` | Claude 4.6 Sonnet, Claude 4.6 Haiku |
-| Google Gemini | `GEMINI_API_KEY` | Gemini 3.1 Flash / Pro, Gemini 2.5 Pro |
+| Google Gemini | `GEMINI_API_KEY` | Gemini 2.5 Flash / Pro |
 | NovitaAI | `NOVITA_API_KEY` | Llama, Qwen, DeepSeek hosting |
 | xAI SuperGrok | `XAI_API_KEY` | No API key needed with SuperGrok OAuth; 1M context |
 
 At least one provider required. Mixed-provider setups fully supported.
 
 ---
+
+## New in v0.15.x
+
+| What | Description |
+|------|-------------|
+| **Kanban Multi-Agent** | `hermes kanban swarm` — parallel workers + gated verifier + synthesizer |
+| **Promptware Defense** | Brainworm/C2 attack patterns blocked at 3 chokepoints |
+| **Bitwarden Secrets Manager** | One `BWS_ACCESS_TOKEN` replaces all per-provider API keys |
+| **Session Orchestrator** | Multi-session switcher in TUI — list/switch/close live sessions |
+| **`/yolo` mid-session** | Enable per-session bypass without restarting |
+| **ntfy push notifications** | 23rd messaging platform — self-hostable, no account/API key needed |
+| **xAI SuperGrok deep integration** | Web Search plugin, 1M context, `hermes migrate xai` |
+| **Faster cold start** | `hermes --version` 701ms → 258ms (-63%) |
 
 ## New in v0.14.0
 

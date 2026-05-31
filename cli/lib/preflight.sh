@@ -27,6 +27,25 @@ preflight_check() {
   _check_cmd "jq" \
     "Install: brew install jq  OR  apt-get install jq"
 
+  # Check hermes-agent version (warn if outdated, Homebrew lags behind PyPI)
+  if command -v hermes &>/dev/null; then
+    local installed_ver
+    installed_ver=$(hermes --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || true)
+    local latest_ver
+    latest_ver=$(curl -fsSL "https://pypi.org/pypi/hermes-agent/json" 2>/dev/null \
+      | grep -o '"version":"[^"]*"' | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
+    if [[ -n "$installed_ver" && -n "$latest_ver" && "$installed_ver" != "$latest_ver" ]]; then
+      warn "hermes-agent ${installed_ver} is installed but ${latest_ver} is available."
+      warn "  Upgrade: pip install --upgrade hermes-agent"
+      warn "  (Homebrew may lag behind — pip install is recommended for the latest version)"
+    elif [[ -n "$installed_ver" ]]; then
+      echo -e "${GREEN}✓${RESET}  hermes-agent ${installed_ver} (up-to-date)"
+    fi
+  else
+    warn "hermes-agent not found on PATH — it will be installed on the VM during bootstrap."
+    warn "  To install locally: pip install hermes-agent  OR  curl -sSL https://hermes-agent.nousresearch.com/install.sh | bash"
+  fi
+
   if [[ "$PREFLIGHT_PASS" == "false" ]]; then
     echo ""
     error "Missing dependencies above. Install them then re-run hermes-agent-cloud."
