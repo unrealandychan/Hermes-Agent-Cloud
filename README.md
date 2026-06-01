@@ -143,11 +143,46 @@ cd Hermes-Agent-Cloud/cli
 hermes-agent-cloud                          # interactive wizard
 hermes-agent-cloud deploy --cloud aws       # flags mode
 hermes-agent-cloud status --cloud azure
+hermes-agent-cloud open                     # open WebUI in browser (SSH tunnel)
+hermes-agent-cloud tunnel                   # foreground SSH tunnel to WebUI
 hermes-agent-cloud ssh    --cloud gcp
 hermes-agent-cloud logs   --cloud aws
 hermes-agent-cloud secrets --cloud azure
 hermes-agent-cloud destroy --cloud aws
 ```
+
+---
+
+## Hermes WebUI
+
+Every cloud deployment automatically installs [hermes-webui](https://github.com/nesquena/hermes-webui) — a lightweight, dark-themed browser interface with full parity to the CLI experience.
+
+### Access
+
+WebUI runs on port `8787` — bound to `127.0.0.1` only (never publicly exposed). Access via SSH tunnel:
+
+```bash
+# Open WebUI in browser (auto tunnel + launch browser)
+hermes-agent-cloud open
+
+# Foreground port-forward only (e.g. for Tailscale or custom routing)
+hermes-agent-cloud tunnel
+# Then open: http://127.0.0.1:8787
+```
+
+### Customisation
+
+| Flag | Default | Description |
+|---|---|---|
+| `--webui-port <port>` | `8787` | WebUI port on the server |
+| `--no-webui` | — | Skip WebUI installation entirely |
+
+```bash
+hermes-agent-cloud deploy --cloud aws --webui-port 9090
+hermes-agent-cloud deploy --cloud gcp --no-webui
+```
+
+The WebUI service is registered as `hermes-webui-<profile>.service` and starts automatically after the gateway on every reboot.
 
 ---
 
