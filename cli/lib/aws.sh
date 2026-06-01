@@ -44,8 +44,7 @@ aws_wizard() {
             || echo "0.0.0.0")
   local allowed_cidr="${my_ip}/32"
   warn "SSH / gateway access will be locked to your current IP: ${my_ip}"
-
-  # ── Step 4: Permission Profile ────────────────────────────────────────────
+  warn "If your local IP changes (ISP, VPN, travel), run: hermes-agent-cloud update-ip"
   step_header 4 $steps "Permission Profile  (IAM policies for this instance)"
 
   gum style --foreground 245 \
@@ -164,6 +163,7 @@ EOF
   config_set "permissions"  "${perm_summary# }"
   config_set "ebs_enabled"  "$ebs_enabled"
   config_set "ebs_size"     "$ebs_size"
+  config_set "allowed_ip"   "$my_ip"
 
   # ── Terraform ─────────────────────────────────────────────────────────────
   echo ""

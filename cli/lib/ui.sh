@@ -262,6 +262,7 @@ post_deploy_guide() {
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud ssh')       open a shell on the instance"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud logs')      stream hermes-gateway logs live"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud status')    show instance IP and health"
+  gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud update-ip') re-lock firewall to your current IP"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud secrets')   rotate or add API keys"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud destroy')   tear it all down"
   echo ""

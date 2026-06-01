@@ -100,6 +100,7 @@ cmd_help() {
   printf "  %-12s %s\n" "status"  "Show live resource status"
   printf "  %-12s %s\n" "open"    "Open Hermes WebUI in your browser (via SSH tunnel)"
   printf "  %-12s %s\n" "tunnel"  "Open SSH tunnel to WebUI (port forward only, no browser)"
+  printf "  %-12s %s\n" "update-ip" "Re-detect your public IP and update cloud firewall rules"
   printf "  %-12s %s\n" "ssh"     "Open a shell on the Hermes instance"
   printf "  %-12s %s\n" "logs"    "Stream live Hermes gateway logs"
   printf "  %-12s %s\n" "secrets" "Update API keys in the cloud vault"
@@ -345,6 +346,62 @@ cmd_tunnel() {
   _webui_ssh_tunnel "tunnel"
 }
 
+# ─── Update IP ──────────────────────────────────────────────────────────────
+# Re-fetches your current public IP and updates the cloud firewall rules.
+# Run this whenever your local IP changes (ISP reassignment, VPN, travel, etc.)
+cmd_update_ip() {
+  config_load
+  [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-agent-cloud deploy"; exit 1; }
+
+  hermes_banner
+
+  # Detect current public IP
+  local new_ip
+  new_ip=$(curl -sf --max-time 5 "https://api.ipify.org" \
+             || curl -sf --max-time 5 "https://ifconfig.me" \
+             || echo "")
+  [[ -z "$new_ip" ]] && { error "Could not detect your public IP. Check your internet connection."; exit 1; }
+
+  local new_cidr="${new_ip}/32"
+  local old_ip
+  old_ip=$(config_get "allowed_ip" 2>/dev/null || echo "unknown")
+
+  if [[ "$new_ip" == "$old_ip" ]]; then
+    success "Your IP is unchanged: ${new_ip} — no update needed."
+    return 0
+  fi
+
+  warn "IP changed: ${old_ip} → ${new_ip}"
+  gum confirm "Update cloud firewall rules to allow ${new_ip}?" || { warn "Aborted."; exit 0; }
+
+  local tf_dir
+  tf_dir=$(config_get "tf_dir")
+  [[ -z "$tf_dir" || ! -d "$tf_dir" ]] && { error "Terraform directory not found: ${tf_dir}"; exit 1; }
+
+  # Patch tfvars in-place
+  if grep -q "allowed_ssh_cidr" "${tf_dir}/terraform.tfvars"; then
+    sed -i "s|allowed_ssh_cidr.*=.*|allowed_ssh_cidr = \"${new_cidr}\"|" "${tf_dir}/terraform.tfvars"
+  else
+    echo "allowed_ssh_cidr = \"${new_cidr}\"" >> "${tf_dir}/terraform.tfvars"
+  fi
+
+  info "Running terraform apply to update firewall rules..."
+  terraform -chdir="$tf_dir" apply -auto-approve \
+    -target="$(case "$CLOUD" in
+      aws)   echo "aws_security_group.hermes_sg" ;;
+      gcp)   echo "google_compute_firewall.hermes_ssh" ;;
+      azure) echo "azurerm_network_security_group.hermes_nsg" ;;
+    esac)" 2>&1 | tail -20
+
+  # Persist new IP
+  config_set "allowed_ip" "$new_ip"
+  config_set "public_ip"  "$(_get_live_ip "$CLOUD")"
+
+  success "Firewall updated. Your new allowed IP: ${new_ip}"
+  info "If tunnel was running, restart it: hermes-agent-cloud tunnel"
+}
+
 # ─── Destroy ────────────────────────────────────────────────────────────────
 cmd_destroy() {
   config_load
@@ -371,9 +428,10 @@ main() {
   case "$cmd" in
     deploy)  cmd_deploy  ;;
     status)  cmd_status  ;;
-    open)    cmd_open    ;;
-    tunnel)  cmd_tunnel  ;;
-    ssh)     cmd_ssh     ;;
+    open)      cmd_open      ;;
+    tunnel)    cmd_tunnel    ;;
+    update-ip) cmd_update_ip ;;
+    ssh)       cmd_ssh       ;;
     logs)    cmd_logs    ;;
     secrets) cmd_secrets ;;
     ebs)     config_load; ebs_cmd "${REMAINING_ARGS[@]:-}" ;;

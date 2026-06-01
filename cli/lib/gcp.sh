@@ -66,6 +66,7 @@ gcp_wizard() {
             || echo "0.0.0.0")
   local allowed_cidr="${my_ip}/32"
   warn "SSH / gateway access will be locked to your current IP: ${my_ip}"
+  warn "If your local IP changes (ISP, VPN, travel), run: hermes-agent-cloud update-ip"
 
   # ── Step 5: Permission Profile ────────────────────────────────────────────
   step_header 5 $steps "Permission Profile  (GCP IAM roles for this instance)"
@@ -143,6 +144,7 @@ EOF
   config_set "tf_dir"     "$tf_dir"
   config_set "ssh_user"   "ubuntu"
   config_set "permissions" "${gcp_perm_summary# }"
+  config_set "allowed_ip" "$my_ip"
 
   # ── Enable required GCP APIs ────────────────────────────────────────────
   echo ""

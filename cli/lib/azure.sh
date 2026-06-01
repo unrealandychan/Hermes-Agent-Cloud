@@ -57,6 +57,7 @@ azure_wizard() {
             || echo "0.0.0.0")
   local allowed_cidr="${my_ip}/32"
   warn "SSH / gateway access will be locked to your current IP: ${my_ip}"
+  warn "If your local IP changes (ISP, VPN, travel), run: hermes-agent-cloud update-ip"
 
   # ── Step 4: Permission Profile ────────────────────────────────────────────
   step_header 4 $steps "Permission Profile  (Azure RBAC roles for this VM)"
@@ -132,6 +133,7 @@ EOF
   config_set "ssh_user"       "azureuser"
   config_set "resource_group" "hermes-rg"
   config_set "permissions"    "${azure_perm_summary# }"
+  config_set "allowed_ip"     "$my_ip"
 
   # ── Terraform ─────────────────────────────────────────────────────────────
   echo ""
