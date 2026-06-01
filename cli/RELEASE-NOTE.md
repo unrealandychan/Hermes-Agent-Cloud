@@ -12,6 +12,58 @@ _Changes staged for the next release will appear here._
 
 ---
 
+## [1.4.0] — 2026-06-01
+
+### Overview
+
+Adds dynamic IP management so users with changing local IPs (ISP DHCP, VPN,
+travel) can re-lock cloud firewall rules without a full redeploy. Also adds a
+self-update check so users are notified at preflight when a newer version is
+available.
+
+### Added
+
+#### `cli/hermes-deploy` — `update-ip` command
+
+New command `hermes-agent-cloud update-ip`:
+- Detects the user's current public IP via `api.ipify.org` / `ifconfig.me`
+- Compares against the IP stored in config at deploy time
+- If changed, prompts for confirmation then patches `terraform.tfvars`
+  `allowed_ssh_cidr` in-place and runs a **targeted** `terraform apply`
+  (only the security group / firewall resource — completes in ~10s)
+- Persists the new `allowed_ip` to config
+- Prints a reminder to restart `tunnel` if it was running
+
+#### `cli/lib/preflight.sh` — self-update check
+
+Every `hermes-agent-cloud` invocation now checks the latest version from
+GitHub (`raw.githubusercontent.com`) and warns if the installed binary is
+behind:
+```
+⚠  hermes-agent-cloud 1.3.0 is installed but 1.4.0 is available.
+   Upgrade: curl -sSL https://raw.githubusercontent.com/.../install.sh | bash
+```
+
+### Changed
+
+#### `cli/lib/aws.sh` / `cli/lib/gcp.sh` / `cli/lib/azure.sh`
+
+- `config_set "allowed_ip"` persisted at deploy time (enables `update-ip` to
+  detect changes on subsequent runs)
+- Added warning at deploy time: *"If your local IP changes (ISP, VPN, travel),
+  run: hermes-agent-cloud update-ip"*
+
+#### `cli/lib/ui.sh` — post-deploy guide
+
+`update-ip` added to the quick-commands list shown after a successful deploy.
+
+#### Version bumps
+
+- `HERMES_DEPLOY_VERSION` bumped `1.3.0` → `1.4.0` in `hermes-deploy` and
+  `install.sh`
+
+---
+
 ## [1.0.3] — 2026-04-25
 
 ### Overview

@@ -20,6 +20,19 @@ preflight_check() {
   gum style --bold --foreground 212 "Checking dependencies..."
   echo ""
 
+  # ── Self-update check ────────────────────────────────────────────────────
+  local latest_deploy_ver
+  latest_deploy_ver=$(curl -fsSL --max-time 5 \
+    "https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/hermes-deploy" 2>/dev/null \
+    | grep -m1 'HERMES_DEPLOY_VERSION=' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
+  if [[ -n "$latest_deploy_ver" && "$latest_deploy_ver" != "$HERMES_DEPLOY_VERSION" ]]; then
+    warn "hermes-agent-cloud ${HERMES_DEPLOY_VERSION} is installed but ${latest_deploy_ver} is available."
+    warn "  Upgrade: curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/install.sh | bash"
+  else
+    echo -e "${GREEN}✓${RESET}  hermes-agent-cloud ${HERMES_DEPLOY_VERSION} (up-to-date)"
+  fi
+  echo ""
+
   _check_cmd "gum" \
     "Install: brew install gum  OR  https://github.com/charmbracelet/gum/releases"
   _check_cmd "terraform" \
