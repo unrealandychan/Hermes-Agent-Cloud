@@ -5,7 +5,7 @@
 # Expects the profile .env to already exist (written by the CLI via ssh_upload_env).
 # Must be run as root (sudo).
 #
-# Usage: bootstrap.sh [--user <ssh-user>] [--profile <profile-name>] [--web-port <port>] [--api-port <port>]
+# Usage: bootstrap.sh [--user <ssh-user>] [--profile <profile-name>] [--web-port <port>] [--api-port <port>] [--webui-port <port>] [--no-webui]
 set -euo pipefail
 
 # ── Version pinning ────────────────────────────────────────────────────────
@@ -17,13 +17,17 @@ HERMES_USER="ubuntu"
 HERMES_PROFILE="default"
 export WEB_PORT="9119"
 export API_PORT="8080"
+export WEBUI_PORT="8787"
+INSTALL_WEBUI="true"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --user)      HERMES_USER="$2";    shift 2 ;;
-    --profile)   HERMES_PROFILE="$2"; shift 2 ;;
-    --web-port)  WEB_PORT="$2";       shift 2 ;;
-    --api-port)  API_PORT="$2";       shift 2 ;;
+    --user)       HERMES_USER="$2";    shift 2 ;;
+    --profile)    HERMES_PROFILE="$2"; shift 2 ;;
+    --web-port)   WEB_PORT="$2";       shift 2 ;;
+    --api-port)   API_PORT="$2";       shift 2 ;;
+    --webui-port) WEBUI_PORT="$2";     shift 2 ;;
+    --no-webui)   INSTALL_WEBUI="false"; shift ;;
     *) shift ;;
   esac
 done
@@ -52,13 +56,13 @@ log "Starting Hermes bootstrap"
 [[ -f "$HERMES_ENV" ]] || fail "$HERMES_ENV not found — API keys must be deployed before running bootstrap"
 
 # ── 1. System packages ──────────────────────────────────────────────────────
-log "Step 1/4: System packages"
+log "Step 1/5: System packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq git curl jq unzip ca-certificates gnupg lsb-release
 
 # ── 2. Install Docker (Hermes sandbox backend) ───────────────────────────────
-log "Step 2/4: Installing Docker"
+log "Step 2/5: Installing Docker"
 if ! command -v docker &>/dev/null; then
   curl -fsSL https://get.docker.com | bash
 fi
@@ -66,7 +70,7 @@ usermod -aG docker "$HERMES_USER"
 log "  Docker $(docker --version)"
 
 # ── 3. Install Hermes Agent ───────────────────────────────────────────────────
-log "Step 3/4: Installing Hermes Agent (version: ${HERMES_VERSION})"
+log "Step 3/5: Installing Hermes Agent (version: ${HERMES_VERSION})"
 if [[ "$HERMES_VERSION" == "latest" ]]; then
   sudo -u "$HERMES_USER" bash -c \
     'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash'
@@ -103,12 +107,76 @@ display:
 web:
   enabled: true
   port: ${WEB_PORT}
+
+webui:
+  enabled: true
+  port: ${WEBUI_PORT}
+  host: 127.0.0.1
+  chat_backend: gateway
 YAML
 chown -R "$HERMES_USER":"$HERMES_USER" "$HERMES_HOME"
 log "  Hermes config written to $HERMES_CONFIG"
 
-# ── 4. Register hermes-gateway systemd service ───────────────────────────────
-log "Step 4/4: Registering systemd service (${SERVICE_NAME})"
+# ── 4. Install Hermes WebUI ───────────────────────────────────────────────────
+log "Step 4/5: Installing Hermes WebUI"
+if [[ "$INSTALL_WEBUI" == "true" ]]; then
+  WEBUI_DIR="/home/${HERMES_USER}/hermes-webui"
+  WEBUI_SERVICE="hermes-webui-${HERMES_PROFILE}"
+
+  if [[ -d "$WEBUI_DIR" ]]; then
+    log "  hermes-webui already cloned — pulling latest"
+    sudo -u "$HERMES_USER" git -C "$WEBUI_DIR" pull --ff-only origin main || true
+  else
+    sudo -u "$HERMES_USER" git clone --depth 1 \
+      https://github.com/nesquena/hermes-webui.git "$WEBUI_DIR"
+  fi
+
+  # Install Python deps inside hermes-agent venv (webui reuses hermes deps)
+  HERMES_VENV="/home/${HERMES_USER}/.hermes/venv"
+  if [[ -d "$HERMES_VENV" ]]; then
+    sudo -u "$HERMES_USER" "$HERMES_VENV/bin/pip" install --quiet \
+      aiofiles aiohttp fastapi uvicorn[standard] 2>/dev/null || true
+  fi
+
+  # Discover gateway port from config (default 8642)
+  GATEWAY_PORT=$(grep -E '^port:' "$HERMES_CONFIG" 2>/dev/null | head -1 | awk '{print $2}' || echo "8642")
+
+  cat > "/etc/systemd/system/${WEBUI_SERVICE}.service" <<EOF
+[Unit]
+Description=Hermes WebUI
+Documentation=https://github.com/nesquena/hermes-webui
+After=network.target ${SERVICE_NAME}.service
+Wants=${SERVICE_NAME}.service
+
+[Service]
+Type=simple
+User=$HERMES_USER
+WorkingDirectory=$WEBUI_DIR
+Environment=HERMES_WEBUI_PORT=${WEBUI_PORT}
+Environment=HERMES_WEBUI_HOST=127.0.0.1
+Environment=HERMES_WEBUI_AGENT_DIR=/home/${HERMES_USER}/.hermes
+Environment=HERMES_WEBUI_CHAT_BACKEND=gateway
+Environment=HERMES_WEBUI_GATEWAY_BASE_URL=http://127.0.0.1:${API_PORT}
+EnvironmentFile=$HERMES_ENV
+ExecStart=${HERMES_VENV}/bin/python ${WEBUI_DIR}/server.py
+Restart=on-failure
+RestartSec=15
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  systemctl daemon-reload
+  systemctl enable "$WEBUI_SERVICE"
+  systemctl start  "$WEBUI_SERVICE"
+  log "  hermes-webui service started on port ${WEBUI_PORT}"
+else
+  log "  Skipping WebUI installation (--no-webui)"
+fi
+# ── 5. Register hermes-gateway systemd service ───────────────────────────────
+log "Step 5/5: Registering systemd service (${SERVICE_NAME})"
 cat > "/etc/systemd/system/${SERVICE_NAME}.service" <<EOF
 [Unit]
 Description=Hermes Agent Gateway
@@ -136,4 +204,9 @@ systemctl enable "${SERVICE_NAME}"
 systemctl start "${SERVICE_NAME}"
 log "  hermes-gateway service started"
 
-log "Bootstrap complete. Check status: journalctl -u ${SERVICE_NAME} -f"
+log "Bootstrap complete."
+log "  Gateway:  journalctl -u ${SERVICE_NAME} -f"
+if [[ "$INSTALL_WEBUI" == "true" ]]; then
+  log "  WebUI:    journalctl -u hermes-webui-${HERMES_PROFILE} -f"
+  log "  Access:   ssh tunnel → http://127.0.0.1:${WEBUI_PORT}"
+fi

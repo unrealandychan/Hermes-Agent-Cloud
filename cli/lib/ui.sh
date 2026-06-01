@@ -252,7 +252,13 @@ post_deploy_guide() {
   gum style --foreground 245        "      Ports 8080 and 9119 are restricted to your current IP only."
   echo ""
 
-  gum style --bold --foreground 255 "  4.  Quick commands"
+  gum style --bold --foreground 255 "  4.  Hermes WebUI (browser chat interface)"
+  gum style --foreground 245        "      $(gum style --foreground 212 'hermes-agent-cloud open')        open WebUI in browser (auto SSH tunnel)"
+  gum style --foreground 245        "      $(gum style --foreground 212 'hermes-agent-cloud tunnel')      forward port only, then open http://127.0.0.1:8787"
+  gum style --foreground 245        "      WebUI runs on port 8787 — never exposed directly, always via SSH tunnel."
+  echo ""
+
+  gum style --bold --foreground 255 "  5.  Quick commands"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud ssh')       open a shell on the instance"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud logs')      stream hermes-gateway logs live"
   gum style --foreground 245 "      $(gum style --foreground 212 'hermes-agent-cloud status')    show instance IP and health"
