@@ -213,8 +213,63 @@ cmd_secrets() {
   esac
 }
 
-# ─── Destroy ────────────────────────────────────────────────────────────────
 # ─── Open / Tunnel ──────────────────────────────────────────────────────────
+# Fetch the live public IP from the cloud provider (handles elastic IP changes after restart)
+_get_live_ip() {
+  local cloud="$1"
+  local ip=""
+  case "$cloud" in
+    aws)
+      local tf_dir region instance_id
+      tf_dir=$(config_get "tf_dir" 2>/dev/null || echo "")
+      region=$(config_get "region" 2>/dev/null || echo "")
+      instance_id=$(config_get "instance_id" 2>/dev/null || echo "")
+      # Try Terraform state first (authoritative)
+      if [[ -n "$tf_dir" && -d "$tf_dir" ]]; then
+        ip=$(terraform -chdir="$tf_dir" output -raw public_ip 2>/dev/null || echo "")
+      fi
+      # Fall back to live AWS API (catches IP change after VM reboot)
+      if [[ -z "$ip" && -n "$instance_id" && -n "$region" ]]; then
+        ip=$(aws ec2 describe-instances \
+          --instance-ids "$instance_id" \
+          --region "$region" \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text 2>/dev/null | grep -v None || echo "")
+      fi
+      ;;
+    gcp)
+      local tf_dir zone
+      tf_dir=$(config_get "tf_dir" 2>/dev/null || echo "")
+      zone=$(config_get "region" 2>/dev/null || echo "")  # region stores zone for GCP
+      if [[ -n "$tf_dir" && -d "$tf_dir" ]]; then
+        ip=$(terraform -chdir="$tf_dir" output -raw public_ip 2>/dev/null || echo "")
+      fi
+      if [[ -z "$ip" && -n "$zone" ]]; then
+        ip=$(gcloud compute instances describe hermes-instance \
+          --zone "$zone" \
+          --format "value(networkInterfaces[0].accessConfigs[0].natIP)" 2>/dev/null || echo "")
+      fi
+      ;;
+    azure)
+      local tf_dir
+      tf_dir=$(config_get "tf_dir" 2>/dev/null || echo "")
+      if [[ -n "$tf_dir" && -d "$tf_dir" ]]; then
+        ip=$(terraform -chdir="$tf_dir" output -raw public_ip 2>/dev/null || echo "")
+      fi
+      if [[ -z "$ip" ]]; then
+        ip=$(az vm list-ip-addresses \
+          --resource-group hermes-rg \
+          --name hermes-instance \
+          --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" \
+          --output tsv 2>/dev/null || echo "")
+      fi
+      ;;
+  esac
+  # Last resort: cached value in config
+  [[ -z "$ip" ]] && ip=$(config_get "public_ip" 2>/dev/null || echo "")
+  echo "$ip"
+}
+
 _webui_ssh_tunnel() {
   local mode="$1"   # "open" or "tunnel"
   config_load
@@ -222,8 +277,12 @@ _webui_ssh_tunnel() {
   [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-agent-cloud deploy"; exit 1; }
 
   local ip ssh_key local_port remote_port
-  ip=$(config_get "public_ip" 2>/dev/null || config_get "vm_ip" 2>/dev/null || echo "")
+  info "Fetching current IP for ${CLOUD}..."
+  ip=$(_get_live_ip "$CLOUD")
   [[ -z "$ip" ]] && { error "Cannot determine VM IP. Check: hermes-agent-cloud status"; exit 1; }
+
+  # Update cached IP in case it changed (e.g. after VM restart)
+  config_set "public_ip" "$ip"
 
   ssh_key=$(config_get "ssh_key_path")
   ssh_key="${ssh_key/#\~/$HOME}"
@@ -231,14 +290,23 @@ _webui_ssh_tunnel() {
   remote_port="$local_port"
 
   info "Opening SSH tunnel → http://127.0.0.1:${local_port}"
-  info "  Remote: ${ip}:${remote_port}  (press Ctrl-C to close)"
+  info "  Remote: ${ip}:${remote_port}"
+
+  # SSH keepalive flags — prevent idle disconnect
+  local keepalive_opts=(
+    -o "ServerAliveInterval=30"
+    -o "ServerAliveCountMax=6"
+    -o "TCPKeepAlive=yes"
+    -o "StrictHostKeyChecking=accept-new"
+    -o "ExitOnForwardFailure=yes"
+  )
 
   if [[ "$mode" == "open" ]]; then
     # Background tunnel, then open browser
-    ssh -f -N -L "${local_port}:127.0.0.1:${remote_port}" \
+    ssh -f -N \
+        -L "${local_port}:127.0.0.1:${remote_port}" \
         -i "$ssh_key" \
-        -o StrictHostKeyChecking=accept-new \
-        -o ExitOnForwardFailure=yes \
+        "${keepalive_opts[@]}" \
         "ubuntu@${ip}"
     sleep 1
     local url="http://127.0.0.1:${local_port}"
@@ -251,11 +319,21 @@ _webui_ssh_tunnel() {
     fi
     success "Tunnel running in background. Close with: pkill -f 'L ${local_port}:127.0.0.1'"
   else
-    # Foreground tunnel — blocks until Ctrl-C
-    ssh -N -L "${local_port}:127.0.0.1:${remote_port}" \
-        -i "$ssh_key" \
-        -o StrictHostKeyChecking=accept-new \
-        "ubuntu@${ip}"
+    # Foreground tunnel — blocks until Ctrl-C, auto-reconnect on drop
+    info "Press Ctrl-C to close. Tunnel will auto-reconnect on disconnect."
+    while true; do
+      ssh -N \
+          -L "${local_port}:127.0.0.1:${remote_port}" \
+          -i "$ssh_key" \
+          "${keepalive_opts[@]}" \
+          "ubuntu@${ip}" || true
+      warn "Tunnel dropped — reconnecting in 5s... (Ctrl-C to stop)"
+      sleep 5
+      # Re-fetch IP in case VM was restarted with a new IP
+      local new_ip
+      new_ip=$(_get_live_ip "$CLOUD")
+      [[ -n "$new_ip" ]] && ip="$new_ip"
+    done
   fi
 }
 

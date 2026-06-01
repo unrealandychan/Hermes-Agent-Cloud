@@ -131,15 +131,34 @@ if [[ "$INSTALL_WEBUI" == "true" ]]; then
       https://github.com/nesquena/hermes-webui.git "$WEBUI_DIR"
   fi
 
-  # Install Python deps inside hermes-agent venv (webui reuses hermes deps)
-  HERMES_VENV="/home/${HERMES_USER}/.hermes/venv"
-  if [[ -d "$HERMES_VENV" ]]; then
-    sudo -u "$HERMES_USER" "$HERMES_VENV/bin/pip" install --quiet \
-      aiofiles aiohttp fastapi uvicorn[standard] 2>/dev/null || true
+  # Locate the hermes-agent venv (installer puts it in ~/.hermes/venv or ~/.local/share/hermes/venv)
+  HERMES_VENV=""
+  for candidate in \
+      "/home/${HERMES_USER}/.hermes/venv" \
+      "/home/${HERMES_USER}/.local/share/hermes/venv"; do
+    if [[ -d "$candidate" ]]; then
+      HERMES_VENV="$candidate"
+      break
+    fi
+  done
+
+  if [[ -z "$HERMES_VENV" ]]; then
+    log "  hermes venv not found — creating standalone venv for webui"
+    sudo -u "$HERMES_USER" python3 -m venv "$WEBUI_DIR/.venv"
+    HERMES_VENV="$WEBUI_DIR/.venv"
   fi
 
-  # Discover gateway port from config (default 8642)
-  GATEWAY_PORT=$(grep -E '^port:' "$HERMES_CONFIG" 2>/dev/null | head -1 | awk '{print $2}' || echo "8642")
+  # Install WebUI deps from its own requirements.txt
+  if [[ -f "$WEBUI_DIR/requirements.txt" ]]; then
+    log "  Installing hermes-webui requirements"
+    sudo -u "$HERMES_USER" "$HERMES_VENV/bin/pip" install --quiet -r "$WEBUI_DIR/requirements.txt"
+  fi
+
+  # Locate hermes-agent dir (the checkout, not the state dir)
+  HERMES_AGENT_DIR=$(sudo -u "$HERMES_USER" bash -c \
+    "dirname \$(command -v hermes 2>/dev/null || echo /home/${HERMES_USER}/.local/bin/hermes) 2>/dev/null || echo ''")
+  # Fallback: use the state dir — webui will auto-discover
+  [[ -z "$HERMES_AGENT_DIR" ]] && HERMES_AGENT_DIR="/home/${HERMES_USER}/.hermes"
 
   cat > "/etc/systemd/system/${WEBUI_SERVICE}.service" <<EOF
 [Unit]
@@ -154,13 +173,14 @@ User=$HERMES_USER
 WorkingDirectory=$WEBUI_DIR
 Environment=HERMES_WEBUI_PORT=${WEBUI_PORT}
 Environment=HERMES_WEBUI_HOST=127.0.0.1
-Environment=HERMES_WEBUI_AGENT_DIR=/home/${HERMES_USER}/.hermes
+Environment=HERMES_WEBUI_STATE_DIR=/home/${HERMES_USER}/.hermes/webui
+Environment=HERMES_WEBUI_AGENT_DIR=${HERMES_AGENT_DIR}
 Environment=HERMES_WEBUI_CHAT_BACKEND=gateway
 Environment=HERMES_WEBUI_GATEWAY_BASE_URL=http://127.0.0.1:${API_PORT}
 EnvironmentFile=$HERMES_ENV
 ExecStart=${HERMES_VENV}/bin/python ${WEBUI_DIR}/server.py
 Restart=on-failure
-RestartSec=15
+RestartSec=10
 StandardOutput=journal
 StandardError=journal
 
