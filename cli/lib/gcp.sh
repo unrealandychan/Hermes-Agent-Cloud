@@ -668,8 +668,12 @@ gcp_doctor() {
     "gcloud compute firewall-rules describe hermes-allow-ssh --project '$project_id' --format='value(sourceRanges[0])' | grep -qx '$allowed_cidr'"
   gcp_doctor_check "Gateway firewall remains restricted." "Gateway firewall rule appears broad or missing." \
     "gcloud compute firewall-rules describe hermes-allow-gateway --project '$project_id' --format='value(sourceRanges[0])' | grep -qx '$allowed_cidr'"
-  gcp_doctor_check "Billing export dataset exists." "Billing export dataset not detected; cost breakdown will stay advisory only." \
-    "bq --project_id '$project_id' show --dataset '${project_id}:${dataset_id}'"
+  if gcp_has_pack "$packs" "bigquery"; then
+    gcp_doctor_check "Managed BigQuery dataset exists." "Managed BigQuery dataset not detected." \
+      "bq --project_id '$project_id' show --dataset '${project_id}:${dataset_id}'"
+  else
+    warn "BigQuery pack not enabled; billing export readiness remains advisory only."
+  fi
 
   if [[ -n "$tf_dir" ]]; then
     gcp_doctor_check "Terraform state directory still exists." "Terraform directory is missing." \
