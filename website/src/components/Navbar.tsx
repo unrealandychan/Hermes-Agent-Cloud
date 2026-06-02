@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Zap, Github } from "lucide-react";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  // On sub-pages (e.g. /changelog), anchor links must be absolute (/#section)
+  // so the browser navigates back to the home page and scrolls to the section.
+  const anchor = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b"
       style={{ borderColor: "var(--border)", background: "rgba(8,9,14,0.85)", backdropFilter: "blur(12px)" }}>
@@ -20,11 +30,11 @@ export default function Navbar() {
         {/* Nav links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium"
           style={{ color: "var(--text-muted)" }}>
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#clouds" className="hover:text-white transition-colors">Clouds</a>
-          <a href="#security" className="hover:text-white transition-colors">Security</a>
-          <a href="#install" className="hover:text-white transition-colors">Install</a>
-          <a href="#about" className="hover:text-white transition-colors"
+          <a href={anchor("features")} className="hover:text-white transition-colors">Features</a>
+          <a href={anchor("clouds")} className="hover:text-white transition-colors">Clouds</a>
+          <a href={anchor("security")} className="hover:text-white transition-colors">Security</a>
+          <a href={anchor("install")} className="hover:text-white transition-colors">Install</a>
+          <a href={anchor("about")} className="hover:text-white transition-colors"
             style={{ color: "var(--amber)" }}>About</a>
           <Link href="/changelog" className="hover:text-white transition-colors">Changelog</Link>
         </nav>
