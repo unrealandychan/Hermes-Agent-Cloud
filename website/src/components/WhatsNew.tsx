@@ -1,7 +1,19 @@
 "use client";
-import { Sparkles, Package, MessageSquare, Monitor, Cpu, Code2, Shuffle, LayoutDashboard, Layers, PuzzleIcon } from "lucide-react";
+import { Sparkles, Package, MessageSquare, Monitor, Cpu, Code2, Shuffle, LayoutDashboard, Layers, PuzzleIcon, GitBranch, Workflow } from "lucide-react";
 
 const NEW_FEATURES = [
+  {
+    icon: GitBranch,
+    color: '#10b981',
+    title: 'Multi-Cloud Redundancy',
+    desc: 'Deploy to two clouds simultaneously with automatic failover. hermes-deploy deploy --redundant gcp keeps you online even if one region goes down.',
+  },
+  {
+    icon: Workflow,
+    color: '#6366f1',
+    title: 'GitHub Actions Integration',
+    desc: 'Generate a tailored CI/CD workflow with hermes-deploy ci-setup. Auto-deploy on PR, destroy on close, upgrade on merge to main.',
+  },
   {
     icon: Layers,
     color: "#f59e0b",

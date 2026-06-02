@@ -4,12 +4,30 @@ import { Sparkles, Rocket } from "lucide-react";
 
 const RELEASES = [
   {
+    version: 'v1.5.0',
+    date: '2026-06-02',
+    label: 'Multi-cloud redundancy + CI/CD + Helm + Terraform Registry',
+    color: '#10b981',
+    icon: Sparkles,
+    badge: 'Latest',
+    changes: [
+      '`hermes-deploy deploy --redundant <cloud>` — deploy to 2 clouds simultaneously',
+      '`hermes-deploy redundancy status|failover` — health check + one-command failover',
+      '`hermes-deploy ci-setup` — generate GitHub Actions workflow (PR deploy/destroy, auto-upgrade, health checks)',
+      '`hermes-deploy backup` — snapshot skills/memory/config to local + S3/GCS/Azure Blob',
+      '`hermes-deploy billing alert` — set USD budget threshold with 80%/100% color-coded alerts',
+      '`hermes-deploy secrets` — Bitwarden Secrets Manager integration',
+      'Helm chart at `k8s/` — EKS/AKS/GKE support with liveness probes and PVC persistence',
+      'Terraform Registry modules at `modules/aws|gcp|azure/` with auto-generated docs',
+    ],
+  },
+  {
     version: "v1.4.0",
     date: "2026-06-02",
     label: "GCP Capability Packs + CI hardening",
     color: "#f59e0b",
     icon: Sparkles,
-    badge: "Latest",
+    badge: "",
     changes: [
       "13 opt-in GCP capability packs — Secret Manager, Vertex AI, BigQuery, Cloud Run, KMS, Artifact Registry, Pub/Sub, Scheduler, Cloud SQL, Storage, Logging, Monitoring, Alerts",
       "5 GCP deployment presets — minimal, dev-agent, data-agent, ai-agent, full-ops",

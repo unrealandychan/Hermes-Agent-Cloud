@@ -2,7 +2,7 @@ apiVersion: v2
 name: hermes-agent
 description: Deploy Hermes Agent to Kubernetes (EKS/AKS/GKE)
 type: application
-version: 1.4.0
+version: 1.5.0
 appVersion: "0.15.2"
 keywords:
   - hermes-agent

@@ -19,8 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Render terraform-docs for AWS module
         uses: terraform-docs/gh-actions@v1.2.0
@@ -28,7 +27,9 @@ jobs:
           working-dir: modules/aws
           output-file: README.md
           output-method: inject
-          git-push: "false"
+          git-push: "true"
+          git-push-user-name: github-actions
+          git-push-user-email: github-actions@github.com
 
       - name: Render terraform-docs for GCP module
         uses: terraform-docs/gh-actions@v1.2.0
@@ -36,7 +37,9 @@ jobs:
           working-dir: modules/gcp
           output-file: README.md
           output-method: inject
-          git-push: "false"
+          git-push: "true"
+          git-push-user-name: github-actions
+          git-push-user-email: github-actions@github.com
 
       - name: Render terraform-docs for Azure module
         uses: terraform-docs/gh-actions@v1.2.0
@@ -44,10 +47,6 @@ jobs:
           working-dir: modules/azure
           output-file: README.md
           output-method: inject
-          git-push: "false"
-
-      - name: Commit updated docs
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs(terraform): auto-update module READMEs via terraform-docs [skip ci]"
-          file_pattern: "modules/**/README.md"
+          git-push: "true"
+          git-push-user-name: github-actions
+          git-push-user-email: github-actions@github.com

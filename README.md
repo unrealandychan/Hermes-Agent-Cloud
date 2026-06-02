@@ -155,6 +155,16 @@ hermes-agent-cloud secrets --cloud azure
 hermes-agent-cloud destroy --cloud aws
 ```
 
+| Command | Description |
+|---|---|
+| `hermes-deploy deploy --redundant <cloud>` | Multi-cloud redundancy: deploy to 2 clouds simultaneously |
+| `hermes-deploy redundancy status\|failover` | Check active cloud + one-command failover |
+| `hermes-deploy ci-setup` | Generate GitHub Actions workflow for automated deploy |
+| `hermes-deploy backup` | Snapshot skills/memory/config to local + S3/GCS/Azure Blob |
+| `hermes-deploy billing alert` | Set USD budget threshold with color-coded spend alerts |
+| `hermes-deploy doctor` | On-instance health checks (service, disk, memory, env) |
+| `hermes-deploy update` | Upgrade hermes-agent on VM to latest version |
+
 ---
 
 ## Hermes WebUI
@@ -278,6 +288,33 @@ GCP now supports a **Core Deploy + Capability Packs** model:
 - **Capability Packs**: Secret Manager, KMS, Storage, BigQuery, Pub/Sub, Artifact Registry, plus preview packs for Cloud Run, Vertex AI, Monitoring, Alerts, Scheduler, and Cloud SQL.
 
 Use-case presets are built in: `minimal`, `dev-agent`, `data-agent`, `ai-agent`, and `full-ops`.
+
+## Kubernetes / Helm
+
+Deploy to existing EKS, AKS, or GKE clusters:
+
+```bash
+helm install hermes-agent ./k8s \
+  --set env.OPENROUTER_API_KEY=your-key \
+  --set persistence.enabled=true
+```
+
+See [k8s/README.md](k8s/README.md) for full values reference.
+
+## Terraform Registry Modules
+
+Use Hermes Agent as a Terraform module in your existing IaC:
+
+```hcl
+module "hermes_agent" {
+  source  = "unrealandychan/hermes-agent/aws"
+  version = "1.5.0"
+  instance_type = "t3.medium"
+  key_name      = "my-key"
+}
+```
+
+Modules for AWS, GCP, and Azure are in [`modules/`](modules/).
 
 ## Web Dashboard
 

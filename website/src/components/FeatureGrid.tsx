@@ -15,6 +15,8 @@ import {
   Database,
   DollarSign,
   FolderOpen,
+  GitBranch,
+  Workflow,
 } from "lucide-react";
 
 const FEATURES = [
@@ -33,6 +35,10 @@ const FEATURES = [
   { icon: Zap,         label: "1-line Install",            desc: "curl | bash · auto-detects macOS or Linux" },
   { icon: HardDrive,   label: "gp3 / SSD Disks",          desc: "Encrypted root disks on all three clouds" },
   { icon: FileCode2,   label: "Self-update Check",         desc: "CLI warns you on launch if a newer version is available on GitHub" },
+  { icon: GitBranch,   label: 'Multi-Cloud Redundancy',  desc: 'Active/standby across AWS, GCP, Azure with one-command failover' },
+  { icon: Workflow,    label: 'GitHub Actions CI/CD',    desc: 'Auto-generate deploy workflows for PR staging, merge upgrades, health checks' },
+  { icon: ShieldCheck, label: 'Bitwarden Secrets',       desc: 'Pull API keys directly from Bitwarden Secrets Manager vault' },
+  { icon: HardDrive,   label: 'Backup & Restore',        desc: 'One-command snapshot of skills/memory/config to S3, GCS or Azure Blob' },
 ];
 
 export default function FeatureGrid() {
