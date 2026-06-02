@@ -1,6 +1,6 @@
 # Hermes Agent Cloud
 
-> Beautiful wizard-first CLI to deploy **Hermes Agent** to AWS, GCP, or Azure — in one command.
+> Beautiful wizard-first CLI to deploy **Hermes Agent** to AWS, GCP, or Azure in one command — with a clear path to other VPS platforms.
 
 Built with [Charm's `gum`](https://github.com/charmbracelet/gum) for a fully interactive TUI. Infrastructure managed by bundled Terraform templates. Zero vendor lock-in, zero container registry required.
 
@@ -9,7 +9,7 @@ Built with [Charm's `gum`](https://github.com/charmbracelet/gum) for a fully int
 ## Features
 
 - **Interactive wizard** — step-by-step prompts for every option; flags can skip any step for scripted use
-- **Three clouds** — AWS (EC2), GCP (Compute Engine), Azure (VM) with dedicated Terraform stacks per provider
+- **Three clouds today** — AWS (EC2), GCP (Compute Engine), Azure (VM) with dedicated Terraform stacks per provider
 - **Four LLM providers** — OpenRouter, OpenAI, Anthropic (Claude), Google Gemini; supply any combination
 - **Zero secrets in infrastructure code** — API keys delivered over SSH directly to the VM's `~/.hermes/.env` (chmod 600); never stored in Terraform state, cloud vaults, or instance metadata
 - **Sandboxed execution** — Hermes runs in Docker with CPU/RAM/disk limits out of the box
@@ -285,6 +285,17 @@ hermes-agent-cloud doctor
 ## Extending Hermes Agent Cloud
 
 The project is designed so that adding a new cloud, region, instance type, or LLM provider requires editing **one file** (`lib/enums.sh`) plus wiring up the execution logic.
+
+### Other VPS roadmap
+
+Direct provisioning is first-class for **AWS, Azure, and GCP** today.
+Support for additional VPS platforms is planned in three stages:
+
+1. **Bring Your Own VPS mode** — connect to an existing Ubuntu VM over SSH and run bootstrap/configure without Terraform provisioning.
+2. **Provider adapters** — add cloud-specific provisioning modules for platforms such as Hetzner, DigitalOcean, and Linode.
+3. **Unified provider interface** — standardize deploy/status/ssh/logs/secrets/destroy behavior so new providers are faster to add.
+
+Security model remains unchanged for VPS mode: secrets delivered over SSH only, no plaintext in Terraform state/infrastructure metadata, and explicit firewall lock-down guidance.
 
 ### Add a new cloud provider
 
