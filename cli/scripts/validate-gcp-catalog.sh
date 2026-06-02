@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# shellcheck disable=SC1091
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# shellcheck source=../lib/ui.sh
-source "${ROOT_DIR}/lib/ui.sh"
 # shellcheck source=../lib/enums.sh
 source "${ROOT_DIR}/lib/enums.sh"
 # shellcheck source=../lib/gcp_catalog.sh

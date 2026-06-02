@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # gcp_catalog.sh — Central catalog for GCP presets, capability packs, APIs, IAM,
 # and managed resource summaries.
+#
+# shellcheck disable=SC2034
 
 readonly GCP_CORE_DEPLOY_RESOURCES=(
   "Compute Engine VM"
