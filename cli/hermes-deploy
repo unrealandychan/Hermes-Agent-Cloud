@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hermes Agent Cloud — Deploy the Hermes Agent to AWS, Azure, or GCP
+# Hermes Agent Cloud — Deploy the Hermes Agent to AWS, GCP, or Azure
 # Usage: hermes-agent-cloud [command] [options]
 set -euo pipefail
 
@@ -49,6 +49,8 @@ source "${HERMES_DEPLOY_DIR}/lib/ssh.sh"
 source "${HERMES_DEPLOY_DIR}/lib/aws.sh"
 # shellcheck source=lib/azure.sh
 source "${HERMES_DEPLOY_DIR}/lib/azure.sh"
+# shellcheck source=lib/gcp_catalog.sh
+source "${HERMES_DEPLOY_DIR}/lib/gcp_catalog.sh"
 # shellcheck source=lib/gcp.sh
 source "${HERMES_DEPLOY_DIR}/lib/gcp.sh"
 # shellcheck source=lib/billing.sh
@@ -63,6 +65,10 @@ CLOUD=""
 export REGION=""
 export DRY_RUN=false
 export NO_COLOR=false
+export GCP_PRESET=""
+export GCP_PACKS=""
+export CONFIG_INPUT_FILE=""
+export EXPLAIN_ONLY=false
 SUBCOMMAND=""
 REMAINING_ARGS=()
 
@@ -72,7 +78,11 @@ parse_flags() {
     case "$1" in
       --cloud)    CLOUD="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; validate_cloud "$CLOUD"; shift 2 ;;
       --region)      REGION="$2"; shift 2 ;;
+      --preset)      GCP_PRESET="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; shift 2 ;;
+      --packs)       GCP_PACKS="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; shift 2 ;;
+      --config)      CONFIG_INPUT_FILE="$2"; shift 2 ;;
       --dry-run)  DRY_RUN=true; shift   ;;
+      --explain)  EXPLAIN_ONLY=true; shift ;;
       --no-color) NO_COLOR=true; shift  ;;
       --help|-h)  cmd_help; exit 0      ;;
       -*)  error "Unknown flag: $1"; exit 1 ;;
@@ -106,14 +116,19 @@ cmd_help() {
   printf "  %-12s %s\n" "secrets" "Update API keys in the cloud vault"
   printf "  %-12s %s\n" "ebs"     "Manage persistent data volume (attach/detach/migrate)  [AWS]"
   printf "  %-12s %s\n" "billing" "Show cloud cost summary and budget alerts"
+  printf "  %-12s %s\n" "doctor"  "Run post-deploy diagnostics (GCP support is richest)"
   printf "  %-12s %s\n" "destroy" "Tear down all deployed resources"
   printf "  %-12s %s\n" "profile" "Manage named profiles (multi-instance)"
   printf "  %-12s %s\n" "version" "Print version"
   echo ""
   gum style --foreground 212 --bold "OPTIONS"
-  printf "  %-20s %s\n" "--cloud aws|azure|gcp" "Target cloud provider"
+  printf "  %-20s %s\n" "--cloud aws|gcp|azure" "Target cloud provider"
   printf "  %-20s %s\n" "--region REGION"        "Cloud region (e.g. ap-east-1)"
+  printf "  %-20s %s\n" "--preset PRESET"        "GCP preset (minimal|dev-agent|data-agent|ai-agent|full-ops)"
+  printf "  %-20s %s\n" "--packs pack1,pack2"    "Extra GCP capability packs"
+  printf "  %-20s %s\n" "--config FILE"          "Load repeatable deploy inputs from a profile file"
   printf "  %-20s %s\n" "--dry-run"              "Show plan only, no resources created"
+  printf "  %-20s %s\n" "--explain"              "Show resolved GCP plan and exit"
   printf "  %-20s %s\n" "--no-color"             "Disable color output"
   printf "  %-20s %s\n" "--help"                 "Show this help"
   echo ""
@@ -121,7 +136,10 @@ cmd_help() {
   echo "  hermes-agent-cloud                               # launch the wizard"
   echo "  hermes-agent-cloud deploy --cloud aws            # deploy to AWS"
   echo "  hermes-agent-cloud deploy --cloud gcp --dry-run  # preview GCP plan"
+  echo "  hermes-agent-cloud deploy --cloud gcp --preset ai-agent --packs pubsub"
+  echo "  hermes-agent-cloud deploy --cloud gcp --config ./gcp-profile.env --explain"
   echo "  hermes-agent-cloud ssh                           # SSH into the instance"
+  echo "  hermes-agent-cloud doctor                        # run diagnostics for the saved deploy"
   echo "  hermes-agent-cloud secrets                       # rotate API keys"
   echo "  hermes-agent-cloud billing                            # view cloud cost summary"
   echo "  hermes-agent-cloud billing --cloud aws               # AWS costs only"
@@ -148,7 +166,7 @@ cmd_deploy() {
     CLOUD="$(echo "$CLOUD" | tr '[:upper:]' '[:lower:]')"
   else
     local cloud_choice
-    cloud_choice=$(choose_one "Choose your cloud provider" "AWS" "Azure" "GCP")
+    cloud_choice=$(choose_one "Choose your cloud provider" "AWS" "GCP" "Azure")
     CLOUD="$(echo "$cloud_choice" | tr '[:upper:]' '[:lower:]')"
   fi
 
@@ -418,6 +436,22 @@ cmd_destroy() {
   esac
 }
 
+# ─── Doctor ───────────────────────────────────────────────────────────────────
+cmd_doctor() {
+  config_load
+  [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-agent-cloud deploy"; exit 1; }
+
+  hermes_banner
+  case "$CLOUD" in
+    gcp)   gcp_doctor   ;;
+    aws|azure)
+      warn "Doctor checks are currently implemented for GCP only."
+      warn "Use status / ssh / logs for ${CLOUD} deployments."
+      ;;
+  esac
+}
+
 # ─── Main ───────────────────────────────────────────────────────────────────
 main() {
   mkdir -p "${HERMES_DEPLOY_HOME}"
@@ -436,6 +470,7 @@ main() {
     secrets) cmd_secrets ;;
     ebs)     config_load; ebs_cmd "${REMAINING_ARGS[@]:-}" ;;
     billing) billing_cmd ;;
+    doctor)  cmd_doctor  ;;
     destroy) cmd_destroy ;;
     profile) cmd_profile "${REMAINING_ARGS[@]:-}" ;;
     version) cmd_version ;;

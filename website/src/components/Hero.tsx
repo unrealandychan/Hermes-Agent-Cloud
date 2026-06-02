@@ -40,7 +40,7 @@ export default function Hero() {
               style={{ color: "var(--text-muted)" }}
             >
               A beautiful, wizard-first CLI that provisions your{" "}
-              <strong className="text-white">Hermes Agent</strong> on AWS, Azure, or GCP
+              <strong className="text-white">Hermes Agent</strong> on AWS, GCP, or Azure
               — with IAM permission profiles, persistent EBS storage, built-in billing insights,
               and one-command instance migration.
             </p>
@@ -75,7 +75,7 @@ export default function Hero() {
 
             {/* Cloud badges */}
             <div className="flex items-center gap-3 mt-8 justify-center lg:justify-start flex-wrap">
-              {["AWS", "Azure", "GCP"].map(cloud => (
+              {["AWS", "GCP", "Azure"].map(cloud => (
                 <span key={cloud} className="badge">{cloud}</span>
               ))}
               <span className="text-xs ml-1" style={{ color: "var(--text-dim)" }}>

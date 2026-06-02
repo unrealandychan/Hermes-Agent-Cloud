@@ -14,7 +14,7 @@
 # Hermes Agent Cloud
 
 > One command. Three clouds. Six LLM providers.
-> Deploy the [Hermes Agent](https://github.com/NousResearch/hermes) to AWS, Azure, or GCP with a beautiful wizard-first CLI — zero plaintext secrets, zero manual infra wiring.
+> Deploy the [Hermes Agent](https://github.com/NousResearch/hermes) to AWS, GCP, or Azure with a beautiful wizard-first CLI — zero plaintext secrets, zero manual infra wiring.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-amber.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-unrealandychan%2FHermes--Agent--Cloud-181717?logo=github)](https://github.com/unrealandychan/Hermes-Agent-Cloud)
@@ -37,7 +37,8 @@ Hermes-Agent-Cloud/
 │   │   ├── config.sh               # ~/.hermes-agent-cloud/config key-value store
 │   │   ├── aws.sh                  # AWS wizard + status/ssh/logs/secrets/destroy
 │   │   ├── azure.sh                # Azure wizard + status/ssh/logs/secrets/destroy
-│   │   └── gcp.sh                  # GCP wizard + status/ssh/logs/secrets/destroy
+│   │   ├── gcp_catalog.sh          # GCP preset / capability-pack registry
+│   │   └── gcp.sh                  # GCP wizard + status/ssh/logs/secrets/destroy/doctor
 │   │
 │   ├── terraform/
 │   │   ├── aws/                    # EC2 + Security Group + IAM + SSM Parameter Store
@@ -53,12 +54,15 @@ Hermes-Agent-Cloud/
 │   │   │   ├── outputs.tf
 │   │   │   ├── network.tf
 │   │   │   └── keyvault.tf
-│   │   └── gcp/                    # Compute Engine + Firewall + Secret Manager + Service Account
+│   │   └── gcp/                    # Core GCP deploy + capability-pack resources
 │   │       ├── main.tf
 │   │       ├── variables.tf
 │   │       ├── outputs.tf
 │   │       ├── firewall.tf
-│   │       └── secretmanager.tf
+│   │       ├── iam.tf
+│   │       ├── network.tf
+│   │       ├── packs.tf
+│   │       └── services.tf
 │   │
 │   ├── scripts/
 │   │   ├── bootstrap.sh            # VM user-data: installs Docker, Hermes, pulls secrets, sets up systemd
@@ -82,7 +86,7 @@ Hermes-Agent-Cloud/
 │   │       ├── Hero.tsx            # Full-width hero + animated TerminalDemo
 │   │       ├── TerminalDemo.tsx    # Auto-replaying wizard terminal animation
 │   │       ├── FeaturesOverview.tsx# 3 pillar cards
-│   │       ├── CloudsSection.tsx   # AWS / Azure / GCP detail cards
+│   │       ├── CloudsSection.tsx   # AWS / GCP / Azure detail cards
 │   │       ├── ProvidersSection.tsx# 4 LLM provider cards
 │   │       ├── FeatureGrid.tsx     # 12-feature grid
 │   │       ├── HowItWorks.tsx      # 4-step numbered guide
@@ -260,11 +264,20 @@ npm run dev          # http://localhost:3000
 
 ## Cloud Support
 
-| Cloud | Compute | Secret Store | SSH Options |
+| Cloud | Compute | Core Support | SSH Options |
 |---|---|---|---|
-| AWS | EC2 (Ubuntu 24.04) | SSM Parameter Store | Direct SSH · SSM Session Manager |
-| Azure | VM Standard_D2s_v3 | Azure Key Vault | Direct SSH · az ssh extension |
-| GCP | Compute Engine e2-standard-2 | Secret Manager | Direct SSH · gcloud compute ssh |
+| AWS | EC2 (Ubuntu 24.04) | EC2 + Security Group + IAM | Direct SSH · SSM Session Manager |
+| Azure | VM Standard_D2s_v3 | VM + VNet + NSG + Managed Identity | Direct SSH · az ssh extension |
+| GCP | Compute Engine e2-standard-2 | VM + static IP + custom VPC/subnet + firewall + service account | Direct SSH · gcloud compute ssh |
+
+### GCP capability packs
+
+GCP now supports a **Core Deploy + Capability Packs** model:
+
+- **Core Deploy**: Compute Engine VM, static IP, custom VPC/subnet, locked-down firewall, service account, declarative IAM, labels, and optional budget.
+- **Capability Packs**: Secret Manager, KMS, Storage, BigQuery, Pub/Sub, Artifact Registry, plus preview packs for Cloud Run, Vertex AI, Monitoring, Alerts, Scheduler, and Cloud SQL.
+
+Use-case presets are built in: `minimal`, `dev-agent`, `data-agent`, `ai-agent`, and `full-ops`.
 
 ## Web Dashboard
 

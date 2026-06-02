@@ -8,7 +8,17 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-_Changes staged for the next release will appear here._
+### Added
+
+- GCP presets and capability-pack catalog (`minimal`, `dev-agent`, `data-agent`, `ai-agent`, `full-ops`)
+- GCP config-driven deploy template: `cli/config/gcp-profile.env.tpl`
+- `hermes-agent-cloud doctor` command with GCP-focused deployment checks
+- GCP IAM / firewall policy checks in CI
+
+### Changed
+
+- GCP deploys now use declarative Terraform-managed APIs, service account bindings, static public IP, custom VPC/subnet, and managed capability-pack resources
+- GCP wizard now includes explain-plan output, project readiness checks, optional monthly budgets, and preset-driven capability selection
 
 ---
 

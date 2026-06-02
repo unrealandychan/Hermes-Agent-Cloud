@@ -29,7 +29,7 @@ hermes_banner() {
   echo -e "${P}   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝${R}"
   echo ""
   echo -e "${D}        A G E N T  C L O U D${R}   ${W}v${HERMES_DEPLOY_VERSION}${R}"
-  echo -e "${D}        Deploy Hermes Agent to AWS · Azure · GCP${R}"
+  echo -e "${D}        Deploy Hermes Agent to AWS · GCP · Azure${R}"
   echo ""
 }
 

@@ -15,8 +15,8 @@ const PILLARS = [
     accent: "#8b5cf6",
     title: "Multi-Cloud, One Tool",
     desc:
-      "AWS EC2, Azure VM, and Google Compute Engine supported out of the box. Each cloud uses Terraform under the hood for reproducible, destroy-safe infrastructure.",
-    tags: ["AWS", "Azure", "GCP", "Terraform"],
+      "AWS EC2, Google Compute Engine, and Azure VM supported out of the box. Each cloud uses Terraform under the hood for reproducible, destroy-safe infrastructure.",
+    tags: ["AWS", "GCP", "Azure", "Terraform"],
   },
   {
     icon: ShieldCheck,
@@ -31,7 +31,7 @@ const PILLARS = [
     accent: "#38bdf8",
     title: "Built-in Billing Insights",
     desc:
-      "Run hermes-agent-cloud billing to query AWS Cost Explorer, Azure Cost Management, or GCP Billing — cost breakdown by service, budget alerts, and monthly totals.",
+      "Run hermes-agent-cloud billing to query AWS Cost Explorer, GCP Billing, or Azure Cost Management — cost breakdown by service, budget alerts, and monthly totals.",
     tags: ["Cost Explorer", "Budget", "Azure Cost", "GCP Billing"],
   },
 ];
