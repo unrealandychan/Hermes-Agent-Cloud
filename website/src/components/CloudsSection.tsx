@@ -60,11 +60,12 @@ export default function CloudsSection() {
           <span className="badge mb-4">Multi-Cloud</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
             One wizard.{" "}
-            <span className="gradient-text">Three clouds.</span>
+            <span className="gradient-text">Three clouds today.</span>
           </h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
             Every cloud provider ships its own Terraform module, IAM wiring, and
-            secret injection strategy — all consistent from the CLI&apos;s perspective.
+            secret injection strategy — all consistent from the CLI&apos;s perspective,
+            with other VPS platforms on the roadmap.
           </p>
         </div>
 
@@ -122,6 +123,9 @@ export default function CloudsSection() {
             </div>
           ))}
         </div>
+        <p className="text-center text-sm mt-8" style={{ color: "var(--text-dim)" }}>
+          Next: Bring Your Own VPS (SSH bootstrap), then provider adapters for additional VPS platforms.
+        </p>
       </div>
     </section>
   );

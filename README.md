@@ -5,7 +5,10 @@
 [![Stars](https://img.shields.io/github/stars/unrealandychan/Hermes-Agent-Cloud?style=for-the-badge&logo=github&color=f78166&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud/stargazers)
 [![Forks](https://img.shields.io/github/forks/unrealandychan/Hermes-Agent-Cloud?style=for-the-badge&logo=github&color=79c0ff&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud/network/members)
 [![Language](https://img.shields.io/badge/Shell-4EAA25?logo=gnubash&style=for-the-badge&logoColor=white&labelColor=0d1117)](https://github.com/unrealandychan/Hermes-Agent-Cloud)
-[![AWS](https://img.shields.io/badge/AWS-Powered-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white&labelColor=0d1117)](https://aws.amazon.com/)
+[![AWS](https://img.shields.io/badge/AWS-Supported-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white&labelColor=0d1117)](https://aws.amazon.com/)
+[![Azure](https://img.shields.io/badge/Azure-Supported-0078D4?style=for-the-badge&logo=microsoft-azure&logoColor=white&labelColor=0d1117)](https://azure.microsoft.com/)
+[![GCP](https://img.shields.io/badge/GCP-Supported-34A853?style=for-the-badge&logo=googlecloud&logoColor=white&labelColor=0d1117)](https://cloud.google.com/)
+[![VPS](https://img.shields.io/badge/Other_VPS-Roadmap-8b5cf6?style=for-the-badge&labelColor=0d1117)](#other-vps-support-roadmap)
 
 </div>
 
@@ -288,6 +291,23 @@ GCP now supports a **Core Deploy + Capability Packs** model:
 - **Capability Packs**: Secret Manager, KMS, Storage, BigQuery, Pub/Sub, Artifact Registry, plus preview packs for Cloud Run, Vertex AI, Monitoring, Alerts, Scheduler, and Cloud SQL.
 
 Use-case presets are built in: `minimal`, `dev-agent`, `data-agent`, `ai-agent`, and `full-ops`.
+
+### Other VPS support (roadmap)
+
+Direct provisioning is currently first-class for **AWS, Azure, and GCP**.
+Other VPS targets are feasible, but not yet first-class in the CLI.
+
+Planned path:
+
+1. **Bring Your Own VPS mode** — target an existing Ubuntu VM over SSH and run bootstrap/configure without Terraform provisioning.
+2. **Provider adapters** — add pluggable stacks for platforms like Hetzner, DigitalOcean, and Linode.
+3. **Unified provider interface** — standardize lifecycle operations to reduce effort for additional providers.
+
+Security model for VPS mode will stay the same:
+
+- Secrets delivered over SSH only.
+- No plaintext secrets in Terraform state or infrastructure metadata.
+- Firewall guidance remains explicit and locked down to operator-controlled CIDRs.
 
 ## Kubernetes / Helm
 
