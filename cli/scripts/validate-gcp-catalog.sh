@@ -37,8 +37,10 @@ assert_contains() {
 }
 
 assert_eq "$(gcp_catalog_merge_pack_csv minimal "")" "" "minimal preset stays core-only"
+assert_eq "$(gcp_catalog_merge_pack_csv dev-agent "")" "secretmanager,storage,artifactregistry,logging,monitoring" "dev-agent preset packs"
 assert_eq "$(gcp_catalog_merge_pack_csv data-agent "")" "storage,bigquery,pubsub,scheduler" "data-agent preset packs"
 assert_eq "$(gcp_catalog_merge_pack_csv ai-agent "pubsub")" "secretmanager,storage,pubsub,artifactregistry,logging,monitoring,vertexai" "ai-agent merges extra packs"
+assert_eq "$(gcp_catalog_merge_pack_csv full-ops "")" "secretmanager,kms,storage,bigquery,pubsub,scheduler,cloudrun,artifactregistry,logging,monitoring,alerts,vertexai,cloudsql" "full-ops preset packs"
 
 assert_contains "$(gcp_catalog_collect_apis "storage,bigquery")" "storage.googleapis.com" "storage API present"
 assert_contains "$(gcp_catalog_collect_apis "storage,bigquery")" "bigquery.googleapis.com" "bigquery API present"

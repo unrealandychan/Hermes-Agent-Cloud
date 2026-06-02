@@ -669,7 +669,7 @@ gcp_doctor() {
   gcp_doctor_check "Gateway firewall remains restricted." "Gateway firewall rule appears broad or missing." \
     "gcloud compute firewall-rules describe hermes-allow-gateway --project '$project_id' --format='value(sourceRanges[0])' | grep -qx '$allowed_cidr'"
   gcp_doctor_check "Billing export dataset exists." "Billing export dataset not detected; cost breakdown will stay advisory only." \
-    "bq --project_id '$project_id' ls -d 2>/dev/null | awk '{print \$1}' | grep -qx '$dataset_id'"
+    "bq --project_id '$project_id' show --dataset '${project_id}:${dataset_id}'"
 
   if [[ -n "$tf_dir" ]]; then
     gcp_doctor_check "Terraform state directory still exists." "Terraform directory is missing." \

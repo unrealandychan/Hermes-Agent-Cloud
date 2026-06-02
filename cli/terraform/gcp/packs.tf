@@ -80,6 +80,7 @@ resource "google_kms_crypto_key" "hermes" {
 
   name            = var.kms_crypto_key_name
   key_ring        = google_kms_key_ring.hermes[0].id
+  # 90-day rotation keeps the default explicit in Terraform and visible in review.
   rotation_period = "7776000s"
   labels          = local.effective_labels
 
