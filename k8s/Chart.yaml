@@ -1,0 +1,16 @@
+apiVersion: v2
+name: hermes-agent
+description: Deploy Hermes Agent to Kubernetes (EKS/AKS/GKE)
+type: application
+version: 1.4.0
+appVersion: "0.15.2"
+keywords:
+  - hermes-agent
+  - ai-agent
+  - llm
+home: https://github.com/unrealandychan/Hermes-Agent-Cloud
+sources:
+  - https://github.com/unrealandychan/Hermes-Agent-Cloud
+maintainers:
+  - name: unrealandychan
+    url: https://github.com/unrealandychan

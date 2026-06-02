@@ -1,0 +1,53 @@
+name: terraform-docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "modules/**/*.tf"
+      - "cli/terraform/**/*.tf"
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Render terraform-docs for AWS module
+        uses: terraform-docs/gh-actions@v1.2.0
+        with:
+          working-dir: modules/aws
+          output-file: README.md
+          output-method: inject
+          git-push: "false"
+
+      - name: Render terraform-docs for GCP module
+        uses: terraform-docs/gh-actions@v1.2.0
+        with:
+          working-dir: modules/gcp
+          output-file: README.md
+          output-method: inject
+          git-push: "false"
+
+      - name: Render terraform-docs for Azure module
+        uses: terraform-docs/gh-actions@v1.2.0
+        with:
+          working-dir: modules/azure
+          output-file: README.md
+          output-method: inject
+          git-push: "false"
+
+      - name: Commit updated docs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(terraform): auto-update module READMEs via terraform-docs [skip ci]"
+          file_pattern: "modules/**/README.md"

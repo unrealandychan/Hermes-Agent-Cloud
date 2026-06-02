@@ -63,9 +63,14 @@ source "${HERMES_DEPLOY_DIR}/lib/profile.sh"
 source "${HERMES_DEPLOY_DIR}/lib/secrets_bws.sh"
 # shellcheck source=lib/backup.sh
 source "${HERMES_DEPLOY_DIR}/lib/backup.sh"
+# shellcheck source=lib/redundancy.sh
+source "${HERMES_DEPLOY_DIR}/lib/redundancy.sh"
+# shellcheck source=lib/ci_setup.sh
+source "${HERMES_DEPLOY_DIR}/lib/ci_setup.sh"
 
 # ─── Globals ────────────────────────────────────────────────────────────────
 CLOUD=""
+REDUNDANT_CLOUD=""
 export REGION=""
 export DRY_RUN=false
 export NO_COLOR=false
@@ -88,6 +93,7 @@ parse_flags() {
       --dry-run)  DRY_RUN=true; shift   ;;
       --explain)  EXPLAIN_ONLY=true; shift ;;
       --no-color) NO_COLOR=true; shift  ;;
+      --redundant) REDUNDANT_CLOUD="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; shift 2 ;;
       --help|-h)  cmd_help; exit 0      ;;
       -*)  error "Unknown flag: $1"; exit 1 ;;
       *)
@@ -124,8 +130,10 @@ cmd_help() {
   printf "  %-12s %s\n" "billing" "Show cloud cost summary and budget alerts"
   printf "  %-12s %s\n" "backup"  "Snapshot skills/memory/config to local + cloud storage"
   printf "  %-12s %s\n" "doctor"  "Run post-deploy diagnostics (GCP support is richest)"
+  printf "  %-12s %s\n" "ci-setup"  "Generate GitHub Actions workflow for deploy automation"
   printf "  %-12s %s\n" "destroy" "Tear down all deployed resources"
   printf "  %-12s %s\n" "profile" "Manage named profiles (multi-instance)"
+  printf "  %-12s %s\n" "redundancy" "Manage multi-cloud failover (status, failover)"
   printf "  %-12s %s\n" "version" "Print version"
   echo ""
   gum style --foreground 212 --bold "OPTIONS"
@@ -183,6 +191,10 @@ cmd_deploy() {
     gcp)   gcp_wizard   ;;
     *)     error "Unknown cloud provider: ${CLOUD}"; exit 1 ;;
   esac
+
+  if [[ -n "$REDUNDANT_CLOUD" ]]; then
+    redundancy_deploy "$CLOUD" "$REDUNDANT_CLOUD"
+  fi
 }
 
 # ─── Status ─────────────────────────────────────────────────────────────────
@@ -618,6 +630,8 @@ main() {
     backup)  backup_cmd  ;;
     destroy) cmd_destroy ;;
     profile) cmd_profile "${REMAINING_ARGS[@]:-}" ;;
+    redundancy) cmd_redundancy "${REMAINING_ARGS[@]:-}" ;;
+    ci-setup) ci_setup_cmd ;;
     version) cmd_version ;;
     help)    cmd_help    ;;
     *)

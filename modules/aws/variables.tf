@@ -1,0 +1,55 @@
+variable "aws_region" {
+  description = "AWS region to deploy into"
+  type        = string
+  default     = "ap-east-1"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type (minimum: t3.large for Hermes 5 GB RAM requirement)"
+  type        = string
+  default     = "t3.large"
+}
+
+variable "key_name" {
+  description = "Name of an existing EC2 Key Pair in the selected region"
+  type        = string
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR block allowed to reach port 22 (SSH) and port 8080 (gateway)"
+  type        = string
+}
+
+# ── Permission Profile ────────────────────────────────────────────────────────
+
+variable "enable_s3" {
+  description = "Attach AmazonS3FullAccess to the Hermes IAM role"
+  type        = bool
+  default     = false
+}
+
+variable "enable_billing" {
+  description = "Attach a billing read-only policy (Cost Explorer, Budgets) to the Hermes IAM role"
+  type        = bool
+  default     = false
+}
+
+variable "enable_rds" {
+  description = "Attach AmazonRDSFullAccess to the Hermes IAM role"
+  type        = bool
+  default     = false
+}
+
+# ── EBS Data Volume ───────────────────────────────────────────────────────────
+
+variable "ebs_enabled" {
+  description = "Provision a persistent data EBS volume separate from the root disk"
+  type        = bool
+  default     = true
+}
+
+variable "ebs_size" {
+  description = "Size in GB of the persistent data EBS volume"
+  type        = number
+  default     = 50
+}
