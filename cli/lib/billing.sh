@@ -13,6 +13,14 @@ billing_cmd() {
   hermes_banner
   config_load
 
+  local subcommand="${REMAINING_ARGS[0]:-}"
+
+  if [[ "$subcommand" == "alert" ]]; then
+    [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud" 2>/dev/null || echo "")"
+    billing_alert
+    return
+  fi
+
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud" 2>/dev/null || echo "")"
 
   if [[ -z "$CLOUD" ]]; then
@@ -269,4 +277,192 @@ for b in json.load(sys.stdin):
 " 2>/dev/null
     echo ""
   fi
+}
+
+# ─── Budget alert helpers ─────────────────────────────────────────────────────
+
+# billing_set_budget — interactive wizard to store a budget threshold in config
+billing_set_budget() {
+  gum style --foreground 212 --bold "  Set Budget Alert Threshold"
+  echo ""
+
+  if [[ -z "$CLOUD" ]]; then
+    local cloud_choice
+    cloud_choice=$(choose_one "Select cloud provider for this budget alert" \
+      "AWS    — Amazon Web Services" \
+      "GCP    — Google Cloud Platform" \
+      "Azure  — Microsoft Azure")
+    CLOUD="$(echo "$cloud_choice" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')"
+  fi
+
+  local amount
+  amount=$(gum input --placeholder "Monthly budget in USD (e.g. 100)" --prompt "  Budget (USD): ")
+
+  if [[ -z "$amount" ]]; then
+    warn "No amount entered — budget alert not saved."
+    return 1
+  fi
+
+  # Validate numeric
+  if ! echo "$amount" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
+    error "Invalid amount '${amount}' — must be a number."
+    return 1
+  fi
+
+  config_set "budget_alert_usd" "$amount"
+  config_set "budget_alert_cloud" "$CLOUD"
+  config_set "budget_alert_set_at" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  success "Budget alert set: \$${amount} USD for ${CLOUD}"
+}
+
+# billing_get_mtd_spend — echo current MTD spend in USD for $CLOUD
+# Returns a plain float string, or empty on failure.
+billing_get_mtd_spend() {
+  local cloud="${1:-$CLOUD}"
+  local start_date end_date spend
+
+  end_date=$(date -u +%Y-%m-%d)
+  start_date=$(date -u +%Y-%m-01)
+
+  case "$cloud" in
+    aws)
+      local total_json
+      total_json=$(aws ce get-cost-and-usage \
+        --time-period "Start=${start_date},End=${end_date}" \
+        --granularity MONTHLY \
+        --metrics "BlendedCost" \
+        --output json 2>/dev/null) || return 1
+      spend=$(echo "$total_json" | python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+results=data.get('ResultsByTime',[])
+total=sum(float(r['Total']['BlendedCost']['Amount']) for r in results)
+print(f'{total:.4f}')
+" 2>/dev/null)
+      ;;
+    azure)
+      local sub_id cost_json
+      sub_id=$(az account show --query id -o tsv 2>/dev/null || echo "")
+      [[ -z "$sub_id" ]] && return 1
+      cost_json=$(az costmanagement query \
+        --type "ActualCost" \
+        --scope "subscriptions/${sub_id}" \
+        --timeframe "MonthToDate" \
+        --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}' \
+        -o json 2>/dev/null) || return 1
+      spend=$(echo "$cost_json" | python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+rows=data.get('rows',[])
+cols=[c['name'] for c in data.get('columns',[])]
+cost_idx=next((i for i,c in enumerate(cols) if 'cost' in c.lower()),0)
+total=sum(float(r[cost_idx]) for r in rows if len(r)>cost_idx)
+print(f'{total:.4f}')
+" 2>/dev/null)
+      ;;
+    gcp)
+      # GCP real-time spend requires BigQuery export; we can't get a number here.
+      warn "GCP real-time MTD spend is not available without BigQuery billing export."
+      return 1
+      ;;
+    *)
+      error "Unknown cloud for spend query: ${cloud}"
+      return 1
+      ;;
+  esac
+
+  echo "$spend"
+}
+
+# billing_alert_check — check spend vs stored threshold; print warning/error
+billing_alert_check() {
+  local budget_usd budget_cloud spend
+
+  budget_usd=$(config_get "budget_alert_usd" 2>/dev/null || echo "")
+  budget_cloud=$(config_get "budget_alert_cloud" 2>/dev/null || echo "")
+
+  if [[ -z "$budget_usd" || -z "$budget_cloud" ]]; then
+    warn "No budget alert configured. Run: hermes-deploy billing alert"
+    return 0
+  fi
+
+  info "Checking MTD spend for ${budget_cloud} against budget \$${budget_usd} USD..."
+  echo ""
+
+  spend=$(billing_get_mtd_spend "$budget_cloud")
+  if [[ -z "$spend" ]]; then
+    warn "Could not retrieve current MTD spend for ${budget_cloud}."
+    return 1
+  fi
+
+  config_set "budget_last_checked" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  # Compare using python3 for float math
+  local pct status
+  pct=$(python3 -c "
+budget=float('${budget_usd}')
+spend=float('${spend}')
+if budget > 0:
+    print(f'{(spend/budget)*100:.1f}')
+else:
+    print('0')
+" 2>/dev/null || echo "0")
+
+  status=$(python3 -c "
+budget=float('${budget_usd}')
+spend=float('${spend}')
+ratio=spend/budget if budget>0 else 0
+if ratio >= 1.0:
+    print('over')
+elif ratio >= 0.8:
+    print('warn')
+else:
+    print('ok')
+" 2>/dev/null || echo "ok")
+
+  case "$status" in
+    over)
+      gum style --foreground 196 --bold \
+        "  ✖ OVER BUDGET: \$${spend} spent of \$${budget_usd} budget (${pct}%) [${budget_cloud}]"
+      ;;
+    warn)
+      gum style --foreground 214 --bold \
+        "  ⚠ WARNING: \$${spend} spent of \$${budget_usd} budget (${pct}%) [${budget_cloud}]"
+      ;;
+    ok)
+      gum style --foreground 82 \
+        "  ✔ OK: \$${spend} spent of \$${budget_usd} budget (${pct}%) [${budget_cloud}]"
+      ;;
+  esac
+  echo ""
+}
+
+# billing_alert — interactive budget alert flow (set + check)
+billing_alert() {
+  gum style --foreground 212 --bold "  Billing Budget Alerts"
+  echo ""
+
+  local budget_usd budget_cloud
+  budget_usd=$(config_get "budget_alert_usd" 2>/dev/null || echo "")
+  budget_cloud=$(config_get "budget_alert_cloud" 2>/dev/null || echo "")
+
+  if [[ -n "$budget_usd" && -n "$budget_cloud" ]]; then
+    info "Current threshold: \$${budget_usd} USD  |  Cloud: ${budget_cloud}"
+    echo ""
+    local update_choice
+    update_choice=$(choose_one "Update budget threshold?" \
+      "No  — keep current (\$${budget_usd} / ${budget_cloud})" \
+      "Yes — set a new threshold")
+    if [[ "$update_choice" == Yes* ]]; then
+      billing_set_budget || return 1
+    fi
+  else
+    info "No budget alert configured yet."
+    echo ""
+    billing_set_budget || return 1
+  fi
+
+  echo ""
+  billing_alert_check
 }

@@ -59,6 +59,10 @@ source "${HERMES_DEPLOY_DIR}/lib/billing.sh"
 source "${HERMES_DEPLOY_DIR}/lib/ebs.sh"
 # shellcheck source=lib/profile.sh
 source "${HERMES_DEPLOY_DIR}/lib/profile.sh"
+# shellcheck source=lib/secrets_bws.sh
+source "${HERMES_DEPLOY_DIR}/lib/secrets_bws.sh"
+# shellcheck source=lib/backup.sh
+source "${HERMES_DEPLOY_DIR}/lib/backup.sh"
 
 # ─── Globals ────────────────────────────────────────────────────────────────
 CLOUD=""
@@ -118,6 +122,7 @@ cmd_help() {
   printf "  %-12s %s\n" "secrets" "Update API keys in the cloud vault"
   printf "  %-12s %s\n" "ebs"     "Manage persistent data volume (attach/detach/migrate)  [AWS]"
   printf "  %-12s %s\n" "billing" "Show cloud cost summary and budget alerts"
+  printf "  %-12s %s\n" "backup"  "Snapshot skills/memory/config to local + cloud storage"
   printf "  %-12s %s\n" "doctor"  "Run post-deploy diagnostics (GCP support is richest)"
   printf "  %-12s %s\n" "destroy" "Tear down all deployed resources"
   printf "  %-12s %s\n" "profile" "Manage named profiles (multi-instance)"
@@ -227,10 +232,23 @@ cmd_secrets() {
   [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-agent-cloud deploy"; exit 1; }
 
   hermes_banner
-  case "$CLOUD" in
-    aws)   aws_secrets   ;;
-    azure) azure_secrets ;;
-    gcp)   gcp_secrets   ;;
+
+  local method
+  method=$(choose_one "How would you like to manage secrets?" \
+    "Manual entry" \
+    "Bitwarden Secrets Manager")
+
+  case "$method" in
+    "Bitwarden Secrets Manager")
+      cmd_secrets_bws
+      ;;
+    *)
+      case "$CLOUD" in
+        aws)   aws_secrets   ;;
+        azure) azure_secrets ;;
+        gcp)   gcp_secrets   ;;
+      esac
+      ;;
   esac
 }
 
@@ -597,6 +615,7 @@ main() {
     secrets) cmd_secrets ;;
     ebs)     config_load; ebs_cmd "${REMAINING_ARGS[@]:-}" ;;
     billing) billing_cmd ;;
+    backup)  backup_cmd  ;;
     destroy) cmd_destroy ;;
     profile) cmd_profile "${REMAINING_ARGS[@]:-}" ;;
     version) cmd_version ;;
