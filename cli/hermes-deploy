@@ -577,22 +577,6 @@ cmd_destroy() {
   esac
 }
 
-# ─── Doctor ───────────────────────────────────────────────────────────────────
-cmd_doctor() {
-  config_load
-  [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
-  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-agent-cloud deploy"; exit 1; }
-
-  hermes_banner
-  case "$CLOUD" in
-    gcp)   gcp_doctor   ;;
-    aws|azure)
-      warn "Doctor checks are currently implemented for GCP only."
-      warn "Use status / ssh / logs for ${CLOUD} deployments."
-      ;;
-  esac
-}
-
 # ─── Main ───────────────────────────────────────────────────────────────────
 main() {
   mkdir -p "${HERMES_DEPLOY_HOME}"
@@ -613,7 +597,6 @@ main() {
     secrets) cmd_secrets ;;
     ebs)     config_load; ebs_cmd "${REMAINING_ARGS[@]:-}" ;;
     billing) billing_cmd ;;
-    doctor)  cmd_doctor  ;;
     destroy) cmd_destroy ;;
     profile) cmd_profile "${REMAINING_ARGS[@]:-}" ;;
     version) cmd_version ;;
