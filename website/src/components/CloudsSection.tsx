@@ -19,22 +19,6 @@ const CLOUDS = [
     tfNote: "Fetches latest Ubuntu 24.04 AMI automatically",
   },
   {
-    id: "azure",
-    name: "Microsoft Azure",
-    short: "Azure",
-    color: "#38bdf8",
-    bgGlyph: "az",
-    services: [
-      { icon: Server, label: "Virtual Machine", detail: "Standard_D2s_v3 · Ubuntu 24.04" },
-      { icon: Lock, label: "Azure Key Vault", detail: "HSM-backed · Managed Identity access" },
-      { icon: Cpu, label: "Managed Identity", detail: "SystemAssigned · auto key-vault access" },
-      { icon: Network, label: "NSG + VNet", detail: "Dedicated subnet · 2 inbound rules" },
-    ],
-    ssh: "Direct SSH or az ssh extension (no public key stored in Azure)",
-    regions: "12 locations pre-validated",
-    tfNote: "Resource group created and tagged per deploy",
-  },
-  {
     id: "gcp",
     name: "Google Cloud Platform",
     short: "GCP",
@@ -49,6 +33,22 @@ const CLOUDS = [
     ssh: "gcloud compute ssh or direct after firewall open",
     regions: "10 regions pre-validated",
     tfNote: "Enables Secret Manager & Compute APIs automatically",
+  },
+  {
+    id: "azure",
+    name: "Microsoft Azure",
+    short: "Azure",
+    color: "#38bdf8",
+    bgGlyph: "az",
+    services: [
+      { icon: Server, label: "Virtual Machine", detail: "Standard_D2s_v3 · Ubuntu 24.04" },
+      { icon: Lock, label: "Azure Key Vault", detail: "HSM-backed · Managed Identity access" },
+      { icon: Cpu, label: "Managed Identity", detail: "SystemAssigned · auto key-vault access" },
+      { icon: Network, label: "NSG + VNet", detail: "Dedicated subnet · 2 inbound rules" },
+    ],
+    ssh: "Direct SSH or az ssh extension (no public key stored in Azure)",
+    regions: "12 locations pre-validated",
+    tfNote: "Resource group created and tagged per deploy",
   },
 ];
 

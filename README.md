@@ -14,7 +14,7 @@
 # Hermes Agent Cloud
 
 > One command. Three clouds. Six LLM providers.
-> Deploy the [Hermes Agent](https://github.com/NousResearch/hermes) to AWS, Azure, or GCP with a beautiful wizard-first CLI — zero plaintext secrets, zero manual infra wiring.
+> Deploy the [Hermes Agent](https://github.com/NousResearch/hermes) to AWS, GCP, or Azure with a beautiful wizard-first CLI — zero plaintext secrets, zero manual infra wiring.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-amber.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-unrealandychan%2FHermes--Agent--Cloud-181717?logo=github)](https://github.com/unrealandychan/Hermes-Agent-Cloud)
@@ -86,7 +86,7 @@ Hermes-Agent-Cloud/
 │   │       ├── Hero.tsx            # Full-width hero + animated TerminalDemo
 │   │       ├── TerminalDemo.tsx    # Auto-replaying wizard terminal animation
 │   │       ├── FeaturesOverview.tsx# 3 pillar cards
-│   │       ├── CloudsSection.tsx   # AWS / Azure / GCP detail cards
+│   │       ├── CloudsSection.tsx   # AWS / GCP / Azure detail cards
 │   │       ├── ProvidersSection.tsx# 4 LLM provider cards
 │   │       ├── FeatureGrid.tsx     # 12-feature grid
 │   │       ├── HowItWorks.tsx      # 4-step numbered guide

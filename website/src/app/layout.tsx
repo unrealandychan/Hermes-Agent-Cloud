@@ -6,8 +6,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Hermes Agent Cloud — Deploy Hermes Agent to Any Cloud",
   description:
-    "Beautiful wizard-first CLI to deploy the Hermes Agent to AWS, Azure, or GCP in one command. Supports OpenAI, Anthropic, Gemini, and OpenRouter. Zero secrets in infrastructure code.",
-  keywords: ["hermes agent", "deploy", "AWS", "Azure", "GCP", "CLI", "LLM", "OpenAI", "Anthropic"],
+    "Beautiful wizard-first CLI to deploy the Hermes Agent to AWS, GCP, or Azure in one command. Supports OpenAI, Anthropic, Gemini, and OpenRouter. Zero secrets in infrastructure code.",
+  keywords: ["hermes agent", "deploy", "AWS", "GCP", "Azure", "CLI", "LLM", "OpenAI", "Anthropic"],
   openGraph: {
     title: "Hermes Agent Cloud — Deploy Hermes Agent to Any Cloud",
     description:

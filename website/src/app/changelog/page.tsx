@@ -29,7 +29,7 @@ const RELEASES = [
     icon: Rocket,
     badge: null,
     changes: [
-      "One-command cloud deployment to AWS, Azure, and GCP",
+      "One-command cloud deployment to AWS, GCP, and Azure",
       "Wizard-first CLI with guided setup",
       "IAM-native secret vaults for API key management",
       "Persistent EBS storage support",

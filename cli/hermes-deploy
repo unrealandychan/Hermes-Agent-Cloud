@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hermes Agent Cloud — Deploy the Hermes Agent to AWS, Azure, or GCP
+# Hermes Agent Cloud — Deploy the Hermes Agent to AWS, GCP, or Azure
 # Usage: hermes-agent-cloud [command] [options]
 set -euo pipefail
 
@@ -166,7 +166,7 @@ cmd_deploy() {
     CLOUD="$(echo "$CLOUD" | tr '[:upper:]' '[:lower:]')"
   else
     local cloud_choice
-    cloud_choice=$(choose_one "Choose your cloud provider" "AWS" "Azure" "GCP")
+    cloud_choice=$(choose_one "Choose your cloud provider" "AWS" "GCP" "Azure")
     CLOUD="$(echo "$cloud_choice" | tr '[:upper:]' '[:lower:]')"
   fi
 

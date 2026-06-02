@@ -19,8 +19,8 @@ billing_cmd() {
     local cloud_choice
     cloud_choice=$(choose_one "Select cloud provider to query billing" \
       "AWS    — Amazon Web Services" \
-      "Azure  — Microsoft Azure" \
-      "GCP    — Google Cloud Platform")
+      "GCP    — Google Cloud Platform" \
+      "Azure  — Microsoft Azure")
     CLOUD="$(echo "$cloud_choice" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')"
   fi
 

@@ -1,6 +1,6 @@
 # Hermes Agent Cloud
 
-> Beautiful wizard-first CLI to deploy **Hermes Agent** to AWS, Azure, or GCP — in one command.
+> Beautiful wizard-first CLI to deploy **Hermes Agent** to AWS, GCP, or Azure — in one command.
 
 Built with [Charm's `gum`](https://github.com/charmbracelet/gum) for a fully interactive TUI. Infrastructure managed by bundled Terraform templates. Zero vendor lock-in, zero container registry required.
 
@@ -9,7 +9,7 @@ Built with [Charm's `gum`](https://github.com/charmbracelet/gum) for a fully int
 ## Features
 
 - **Interactive wizard** — step-by-step prompts for every option; flags can skip any step for scripted use
-- **Three clouds** — AWS (EC2), Azure (VM), GCP (Compute Engine) with dedicated Terraform stacks per provider
+- **Three clouds** — AWS (EC2), GCP (Compute Engine), Azure (VM) with dedicated Terraform stacks per provider
 - **Four LLM providers** — OpenRouter, OpenAI, Anthropic (Claude), Google Gemini; supply any combination
 - **Zero secrets in infrastructure code** — API keys delivered over SSH directly to the VM's `~/.hermes/.env` (chmod 600); never stored in Terraform state, cloud vaults, or instance metadata
 - **Sandboxed execution** — Hermes runs in Docker with CPU/RAM/disk limits out of the box
@@ -62,8 +62,8 @@ Hermes Agent Cloud is a Bash-based tool and **requires a POSIX shell environment
 | Cloud | CLI | Install |
 |---|---|---|
 | AWS | `aws` + Session Manager plugin | `brew install awscli` |
-| Azure | `az` | `brew install azure-cli` |
 | GCP | `gcloud` | `brew install --cask google-cloud-sdk` |
+| Azure | `az` | `brew install azure-cli` |
 
 You only need the CLI for the cloud you are deploying to.
 
@@ -128,7 +128,7 @@ That's it. The wizard walks you through cloud selection → region → instance 
 
 | Flag | Description |
 |---|---|
-| `--cloud aws\|azure\|gcp` | Target cloud (validated against known values) |
+| `--cloud aws\|gcp\|azure` | Target cloud (validated against known values) |
 | `--region REGION` | Cloud region (e.g. `ap-east-1`) |
 | `--preset PRESET` | GCP preset (`minimal`, `dev-agent`, `data-agent`, `ai-agent`, `full-ops`) |
 | `--packs pack1,pack2` | Extra GCP capability packs |
@@ -147,13 +147,13 @@ $ hermes-agent-cloud
 
 ╔══════════════════════════════════════╗
 ║   ⚡  HERMES AGENT CLOUD  v1.0.1      ║
-║   Deploy Hermes Agent to AWS · Azure · GCP ║
+║   Deploy Hermes Agent to AWS · GCP · Azure ║
 ╚══════════════════════════════════════╝
 
 [1/6]  Cloud provider
   ❯ AWS   — Amazon Web Services
-    Azure — Microsoft Azure
     GCP   — Google Cloud Platform
+    Azure — Microsoft Azure
 
 [2/6]  AWS Region
   ❯ ap-east-1      (Hong Kong)

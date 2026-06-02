@@ -5,7 +5,7 @@ const ITEMS = [
   {
     icon: Lock,
     title: "Secrets never leave your cloud",
-    desc: "API keys are written to AWS SSM Parameter Store, Azure Key Vault, or GCP Secret Manager via Terraform — and fetched at boot over IAM-native metadata endpoints. No key ever passes through Hermes Agent Cloud's process.",
+    desc: "API keys are written to AWS SSM Parameter Store, GCP Secret Manager, or Azure Key Vault via Terraform — and fetched at boot over IAM-native metadata endpoints. No key ever passes through Hermes Agent Cloud's process.",
   },
   {
     icon: EyeOff,
@@ -20,12 +20,12 @@ const ITEMS = [
   {
     icon: Key,
     title: "IAM least-privilege",
-    desc: "EC2 instance roles, Azure Managed Identities, and GCP Service Accounts are each scoped to read only the secrets created for that deployment — nothing more.",
+    desc: "EC2 instance roles, GCP Service Accounts, and Azure Managed Identities are each scoped to read only the secrets created for that deployment — nothing more.",
   },
   {
     icon: ShieldCheck,
     title: "Encrypted root disks",
-    desc: "AWS uses gp3 encrypted EBS volumes. Azure uses Premium_LRS with encryption-at-rest. GCP uses pd-ssd with AES-256 Google-managed keys.",
+    desc: "AWS uses gp3 encrypted EBS volumes. GCP uses pd-ssd with AES-256 Google-managed keys. Azure uses Premium_LRS with encryption-at-rest.",
   },
 ];
 
