@@ -82,6 +82,11 @@ fi
 # Locate the hermes binary (installer may put it in ~/.local/bin or /usr/local/bin)
 HERMES_BIN=$(sudo -u "$HERMES_USER" bash -c \
   "command -v hermes 2>/dev/null || echo /home/${HERMES_USER}/.local/bin/hermes")
+
+# Log installed version to systemd journal (#37)
+INSTALLED_VER=$(sudo -u "$HERMES_USER" "$HERMES_BIN" version 2>/dev/null | head -1 || echo "unknown")
+logger -t hermes-agent "hermes-agent installed: ${INSTALLED_VER} (requested: ${HERMES_VERSION})"
+log "  hermes-agent installed: ${INSTALLED_VER}"
 log "  Hermes binary: $HERMES_BIN"
 
 # Write Hermes config

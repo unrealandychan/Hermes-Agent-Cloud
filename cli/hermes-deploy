@@ -106,6 +106,8 @@ cmd_help() {
   echo "  hermes-agent-cloud [command] [options]"
   echo ""
   gum style --foreground 212 --bold "COMMANDS"
+  printf "  %-12s %s\n" "update"  "Upgrade hermes-agent on the VM to the latest version"
+  printf "  %-12s %s\n" "doctor"  "Run on-instance health checks (service, disk, memory, env)"
   printf "  %-12s %s\n" "deploy"  "Deploy Hermes Agent to a cloud provider (default)"
   printf "  %-12s %s\n" "status"  "Show live resource status"
   printf "  %-12s %s\n" "open"    "Open Hermes WebUI in your browser (via SSH tunnel)"
@@ -420,7 +422,146 @@ cmd_update_ip() {
   info "If tunnel was running, restart it: hermes-agent-cloud tunnel"
 }
 
-# ─── Destroy ────────────────────────────────────────────────────────────────
+# ─── Doctor ─────────────────────────────────────────────────────────────────
+cmd_doctor() {
+  config_load
+  [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+
+  hermes_banner
+  local ip ssh_key
+  ip=$(_get_live_ip "$CLOUD")
+  [[ -z "$ip" ]] && { error "Cannot determine VM IP. Check: hermes-deploy status"; exit 1; }
+  ssh_key=$(config_get "ssh_key_path")
+  ssh_key="${ssh_key/#\~/$HOME}"
+
+  info "Running on-instance health check on ${ip}..."
+  echo ""
+  ssh_run_cmd "$ip" "ubuntu" "$ssh_key" '
+    set +e
+    pass() { printf "\033[32m  ✓\033[0m  %s\n" "$1"; }
+    fail() { printf "\033[31m  ✗\033[0m  %s\n" "$1"; FAILED=1; }
+    warn() { printf "\033[33m  ⚠\033[0m  %s\n" "$1"; }
+    FAILED=0
+
+    echo ""
+    printf "\033[1;37m  ─── Hermes Agent Doctor ────────────────────────────\033[0m\n"
+    echo ""
+
+    # 1. hermes-gateway service
+    if systemctl is-active --quiet hermes-gateway 2>/dev/null; then
+      pass "hermes-gateway service is running"
+    else
+      fail "hermes-gateway service is NOT running  (sudo systemctl start hermes-gateway)"
+    fi
+
+    # 2. Gateway HTTP response
+    if curl -sf --max-time 5 http://127.0.0.1:8080/health &>/dev/null; then
+      pass "Gateway health endpoint /health responded OK"
+    else
+      warn "Gateway /health did not respond (may still be starting)"
+    fi
+
+    # 3. hermes-agent installed + version
+    HERMES_BIN=$(command -v hermes 2>/dev/null || echo "")
+    if [[ -n "$HERMES_BIN" ]]; then
+      VER=$(hermes version 2>/dev/null | head -1 || echo "unknown")
+      pass "hermes-agent installed: $VER"
+    else
+      fail "hermes binary not found in PATH"
+    fi
+
+    # 4. ~/.hermes/.env exists
+    if [[ -f "$HOME/.hermes/.env" && -s "$HOME/.hermes/.env" ]]; then
+      pass "~/.hermes/.env present and non-empty"
+    else
+      fail "~/.hermes/.env missing or empty  (run: hermes-deploy secrets)"
+    fi
+
+    # 5. Docker running
+    if systemctl is-active --quiet docker 2>/dev/null; then
+      pass "Docker daemon is running"
+    else
+      warn "Docker daemon is not running"
+    fi
+
+    # 6. Disk usage
+    DISK=$(df -h / | awk "NR==2{print \$5}" | tr -d %)
+    if (( DISK < 85 )); then
+      pass "Disk usage: ${DISK}%"
+    elif (( DISK < 95 )); then
+      warn "Disk usage: ${DISK}% — getting full"
+    else
+      fail "Disk usage: ${DISK}% — critically full"
+    fi
+
+    # 7. Memory
+    MEM_FREE=$(free -m | awk "/^Mem:/{print \$7}")
+    if (( MEM_FREE > 512 )); then
+      pass "Available memory: ${MEM_FREE} MB"
+    else
+      warn "Available memory: ${MEM_FREE} MB — low"
+    fi
+
+    echo ""
+    if [[ "$FAILED" == "0" ]]; then
+      printf "  \033[32m✓ All checks passed\033[0m\n"
+    else
+      printf "  \033[31m✗ Some checks failed — see above\033[0m\n"
+    fi
+    echo ""
+    exit "$FAILED"
+  '
+}
+
+# ─── Update ─────────────────────────────────────────────────────────────────
+cmd_update() {
+  config_load
+  [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
+  [[ -z "$CLOUD" ]] && { error "No deployment found. Run: hermes-deploy deploy"; exit 1; }
+
+  hermes_banner
+  local ip ssh_key
+  ip=$(_get_live_ip "$CLOUD")
+  [[ -z "$ip" ]] && { error "Cannot determine VM IP. Check: hermes-deploy status"; exit 1; }
+  ssh_key=$(config_get "ssh_key_path")
+  ssh_key="${ssh_key/#\~/$HOME}"
+
+  info "Upgrading hermes-agent on ${ip}..."
+  echo ""
+  ssh_run_cmd "$ip" "ubuntu" "$ssh_key" '
+    set -e
+    echo ""
+    printf "\033[1;37m  ─── Upgrading Hermes Agent ─────────────────────────\033[0m\n"
+    echo ""
+
+    # Get current version before upgrade
+    OLD_VER=$(hermes version 2>/dev/null | head -1 || echo "unknown")
+    printf "  Current version: \033[33m%s\033[0m\n" "$OLD_VER"
+
+    # Upgrade via pip if venv exists, else via curl installer
+    VENV=$(ls -d ~/.hermes/venv ~/.local/share/hermes/venv 2>/dev/null | head -1 || echo "")
+    if [[ -n "$VENV" && -f "$VENV/bin/pip" ]]; then
+      printf "  Upgrading via pip...\n"
+      "$VENV/bin/pip" install --upgrade hermes-agent
+    else
+      printf "  Upgrading via install script...\n"
+      curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+    fi
+
+    NEW_VER=$(hermes version 2>/dev/null | head -1 || echo "unknown")
+    printf "\n  Upgraded: \033[33m%s\033[0m → \033[32m%s\033[0m\n" "$OLD_VER" "$NEW_VER"
+
+    # Log version to systemd journal
+    logger -t hermes-agent "hermes-agent upgraded: $OLD_VER -> $NEW_VER"
+
+    # Restart gateway to pick up new version
+    sudo systemctl restart hermes-gateway
+    printf "  \033[32m✓ hermes-gateway restarted with new version\033[0m\n\n"
+  '
+}
+
+# ─── Destroy ─────────────────────────────────────────────────────────────────
 cmd_destroy() {
   config_load
   [[ -z "$CLOUD" ]] && CLOUD="$(config_get "cloud")"
@@ -460,6 +601,8 @@ main() {
   local cmd="${SUBCOMMAND:-deploy}"
 
   case "$cmd" in
+    update)  cmd_update  ;;
+    doctor)  cmd_doctor  ;;
     deploy)  cmd_deploy  ;;
     status)  cmd_status  ;;
     open)      cmd_open      ;;

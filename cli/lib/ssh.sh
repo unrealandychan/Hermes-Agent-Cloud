@@ -153,3 +153,22 @@ ssh_update_key() {
 
   success "${var_name} updated and hermes-gateway restarted."
 }
+
+# ─── Run a command on the remote VM and stream output ───────────────────────
+# ssh_run_cmd <ip> <user> <key_path> <remote_command>
+ssh_run_cmd() {
+  local ip="$1"
+  local user="$2"
+  local key="$3"
+  local remote_cmd="$4"
+
+  key="${key/#\~/$HOME}"
+  _fix_key_permissions "$key"
+
+  ssh -i "$key" \
+      -o StrictHostKeyChecking=accept-new \
+      -o ConnectTimeout=15 \
+      -o ServerAliveInterval=30 \
+      "${user}@${ip}" \
+      "$remote_cmd"
+}
