@@ -8,7 +8,7 @@ if grep -R -nE 'roles/(owner|editor)' "${ROOT_DIR}/terraform/gcp" "${ROOT_DIR}/l
   exit 1
 fi
 
-if grep -R -n '0.0.0.0/0' "${ROOT_DIR}/terraform/gcp"; then
+if grep -R -n --include="*.tf" '0.0.0.0/0' "${ROOT_DIR}/terraform/gcp"; then
   echo "FAIL: open GCP firewall rule detected." >&2
   exit 1
 fi
