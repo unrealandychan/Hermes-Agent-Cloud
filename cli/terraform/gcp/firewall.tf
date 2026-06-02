@@ -1,6 +1,6 @@
 resource "google_compute_firewall" "hermes_ssh" {
   name    = "hermes-allow-ssh"
-  network = "default"
+  network = google_compute_network.hermes.name
 
   allow {
     protocol = "tcp"
@@ -9,12 +9,14 @@ resource "google_compute_firewall" "hermes_ssh" {
 
   source_ranges = [var.allowed_ssh_cidr]
   target_tags   = ["hermes-agent"]
-  description   = "Allow SSH to Hermes instance from deployer IP only"
+  description   = "Allow SSH to Hermes instance from the configured CIDR only"
+
+  depends_on = [google_project_service.required]
 }
 
 resource "google_compute_firewall" "hermes_gateway" {
   name    = "hermes-allow-gateway"
-  network = "default"
+  network = google_compute_network.hermes.name
 
   allow {
     protocol = "tcp"
@@ -22,13 +24,15 @@ resource "google_compute_firewall" "hermes_gateway" {
   }
 
   source_ranges = [var.allowed_ssh_cidr]
-  target_tags   = ["hermes-agent"]
-  description   = "Allow Hermes gateway port from deployer IP only"
+  target_tags   = ["hermes-gateway"]
+  description   = "Allow Hermes gateway from the configured CIDR only"
+
+  depends_on = [google_project_service.required]
 }
 
 resource "google_compute_firewall" "hermes_dashboard" {
   name    = "hermes-allow-dashboard"
-  network = "default"
+  network = google_compute_network.hermes.name
 
   allow {
     protocol = "tcp"
@@ -36,6 +40,8 @@ resource "google_compute_firewall" "hermes_dashboard" {
   }
 
   source_ranges = [var.allowed_ssh_cidr]
-  target_tags   = ["hermes-agent"]
-  description   = "Allow Hermes web dashboard port from deployer IP only"
+  target_tags   = ["hermes-dashboard"]
+  description   = "Allow Hermes dashboard from the configured CIDR only"
+
+  depends_on = [google_project_service.required]
 }

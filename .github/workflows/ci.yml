@@ -22,6 +22,15 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
       - run: cd cli/terraform/${{ matrix.cloud }} && terraform init -backend=false && terraform validate
 
+  gcp-policy-and-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate GCP catalog presets
+        run: bash cli/scripts/validate-gcp-catalog.sh
+      - name: Check GCP IAM and firewall policy
+        run: bash cli/scripts/check-gcp-policy.sh
+
   website-build:
     runs-on: ubuntu-latest
     defaults:

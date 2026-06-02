@@ -2,6 +2,16 @@
 
 All notable changes to Hermes Agent Cloud will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- GCP presets, capability packs, explain-plan flow, and repeatable profile-file deploys
+- `hermes-agent-cloud doctor` for GCP deployment diagnostics
+
+### Changed
+- GCP Terraform now manages a static IP, custom VPC/subnet, declarative IAM bindings, API enablement, optional budgets, and managed pack resources
+- CI now checks GCP catalog integrity plus IAM / firewall policy safety
+
 ## [1.1.0] - 2026-05-26
 
 ### Added

@@ -1,6 +1,6 @@
 output "public_ip" {
-  description = "Public IP address of the Hermes instance"
-  value       = google_compute_instance.hermes.network_interface[0].access_config[0].nat_ip
+  description = "Reserved public IP address of the Hermes instance"
+  value       = google_compute_address.hermes.address
 }
 
 output "instance_id" {
@@ -8,12 +8,22 @@ output "instance_id" {
   value       = google_compute_instance.hermes.name
 }
 
-output "ssh_command" {
-  description = "gcloud SSH command (recommended)"
-  value       = "gcloud compute ssh ${google_compute_instance.hermes.name} --zone ${var.zone} --project ${var.project_id}"
+output "service_account_email" {
+  description = "Service account attached to the Hermes VM"
+  value       = google_service_account.hermes.email
+}
+
+output "network_name" {
+  description = "Custom VPC for the Hermes deployment"
+  value       = google_compute_network.hermes.name
+}
+
+output "subnetwork_name" {
+  description = "Dedicated subnet for the Hermes deployment"
+  value       = google_compute_subnetwork.hermes.name
 }
 
 output "gateway_url" {
   description = "Hermes gateway URL"
-  value       = "http://${google_compute_instance.hermes.network_interface[0].access_config[0].nat_ip}:8080"
+  value       = "http://${google_compute_address.hermes.address}:8080"
 }

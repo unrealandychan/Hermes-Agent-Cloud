@@ -119,6 +119,7 @@ That's it. The wizard walks you through cloud selection → region → instance 
 | `hermes-agent-cloud ssh` | Open a shell on the deployed instance |
 | `hermes-agent-cloud logs` | Stream live `hermes-gateway` logs |
 | `hermes-agent-cloud secrets` | Rotate or add API keys on the running instance |
+| `hermes-agent-cloud doctor` | Run deployment diagnostics (richest on GCP) |
 | `hermes-agent-cloud destroy` | Tear down all resources (gated by confirmation prompt) |
 | `hermes-agent-cloud version` | Print CLI version |
 | `hermes-agent-cloud help` | Show usage |
@@ -129,7 +130,11 @@ That's it. The wizard walks you through cloud selection → region → instance 
 |---|---|
 | `--cloud aws\|azure\|gcp` | Target cloud (validated against known values) |
 | `--region REGION` | Cloud region (e.g. `ap-east-1`) |
+| `--preset PRESET` | GCP preset (`minimal`, `dev-agent`, `data-agent`, `ai-agent`, `full-ops`) |
+| `--packs pack1,pack2` | Extra GCP capability packs |
+| `--config FILE` | Load GCP inputs from a repeatable profile file |
 | `--dry-run` | Run `terraform plan` only, no resources created |
+| `--explain` | Show the resolved GCP plan and exit |
 | `--no-color` | Disable color output |
 | `--help` | Show help |
 
@@ -222,6 +227,58 @@ hermes-agent-cloud secrets
 - **Secrets**: API keys are delivered directly to the VM over SSH and written to `~/.hermes/.env` (chmod 600). They are never stored in Terraform state, cloud vaults, or instance metadata.
 - **SSH transport**: Key delivery and install use your existing SSH key pair — no additional cloud credentials or IAM roles required for secret access.
 - **Docker sandbox**: Hermes terminal backend runs in a container with 1 vCPU / 5 GB RAM / 50 GB disk limits.
+
+---
+
+## GCP Support Model
+
+GCP now uses two tracks:
+
+- **Core Deploy** — Compute Engine VM, static public IP, custom VPC/subnet, restricted firewall rules, service account, declarative IAM bindings, boot disk, and labels.
+- **Capability Packs** — optional GCP services added through presets or explicit pack selection.
+
+### GCP presets
+
+| Preset | Intended use | Default packs | Cost class |
+|---|---|---|---|
+| `minimal` | Fastest single-VM deploy | Core only | Low |
+| `dev-agent` | Build/runtime helper | Secret Manager, Storage, Artifact Registry, Logging, Monitoring | Medium |
+| `data-agent` | Storage + analytics | Storage, BigQuery, Pub/Sub, Scheduler | Medium-High |
+| `ai-agent` | Vertex/model workflows | Secret Manager, Storage, Artifact Registry, Vertex AI, Logging, Monitoring | Medium-High |
+| `full-ops` | Broadest project automation | All current packs | High |
+
+### GCP capability matrix
+
+| Domain | Pack | Status | Managed by Terraform |
+|---|---|---|---|
+| Identity & Security | `secretmanager` | Supported | Secret container only (no secret values) |
+| Identity & Security | `kms` | Supported | Key ring + crypto key |
+| Storage & Data | `storage` | Supported | Bucket with versioning + lifecycle |
+| Storage & Data | `bigquery` | Supported | Dataset |
+| Events & Integration | `pubsub` | Supported | Topic |
+| App Runtime | `artifactregistry` | Supported | Docker repository |
+| App Runtime | `cloudrun` | Preview | API + IAM only |
+| AI / ML | `vertexai` | Preview | API + IAM only |
+| Observability | `logging`, `monitoring`, `alerts` | Preview | API + IAM only |
+| Storage & Data | `cloudsql` | Preview | API + IAM only |
+| Events & Integration | `scheduler` | Preview | API + IAM only |
+
+### Repeatable profile file
+
+```bash
+cp /tmp/workspace/unrealandychan/Hermes-Agent-Cloud/cli/config/gcp-profile.env.tpl ./gcp-profile.env
+hermes-agent-cloud deploy --cloud gcp --config ./gcp-profile.env --explain
+hermes-agent-cloud deploy --cloud gcp --config ./gcp-profile.env
+```
+
+### Explain and doctor
+
+```bash
+hermes-agent-cloud deploy --cloud gcp --preset ai-agent --packs pubsub --explain
+hermes-agent-cloud doctor
+```
+
+`--explain` prints services, IAM scope, cost class, and blast radius before provisioning. `doctor` verifies GCP project access, billing linkage, enabled APIs, firewall lock-down, and deployment state for the saved config.
 
 ---
 
@@ -366,15 +423,17 @@ hermes-agent-cloud/
 │   ├── config.sh              Persist/read ~/.hermes-agent-cloud/config
 │   ├── aws.sh                 AWS wizard + management commands
 │   ├── azure.sh               Azure wizard + management commands
+│   ├── gcp_catalog.sh         GCP preset / capability-pack registry
 │   └── gcp.sh                 GCP wizard + management commands
 ├── terraform/
 │   ├── aws/                   EC2 + VPC + IAM (no SSM — 4 files)
 │   ├── azure/                 VM + VNet + NSG (no Key Vault — 4 files)
-│   └── gcp/                   Compute Engine + Firewall (no Secret Manager — 4 files)
+│   └── gcp/                   Core deploy + GCP capability packs
 ├── scripts/
 │   ├── bootstrap.sh           SSH-run installer: system packages → Docker → Hermes → systemd
 │   └── configure.sh           Post-deploy health-check (run on instance)
 └── config/
+    ├── gcp-profile.env.tpl    Repeatable GCP profile template
     └── hermes.yaml.tpl        Hermes configuration template
 ```
 
