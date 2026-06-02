@@ -23,13 +23,16 @@ const FEATURES = [
   { icon: DollarSign,  label: "Built-in Billing Insights", desc: "hermes-agent-cloud billing — cost summary, top services, and budget alerts" },
   { icon: Database,    label: "RDS / Cloud SQL Access",    desc: "Full database access profile for AWS RDS, GCP Cloud SQL, and Azure SQL" },
   { icon: FolderOpen,  label: "S3 / Blob Storage Access",  desc: "Read/write access to AWS S3, GCP Cloud Storage, and Azure Blob Storage" },
+  { icon: Layers,      label: "GCP Capability Packs",      desc: "13 opt-in packs: Secret Manager, Vertex AI, BigQuery, Cloud Run, KMS, and more" },
   { icon: Container,   label: "Docker Sandbox",            desc: "5 GB RAM · 50 GB disk · container isolation" },
   { icon: Activity,    label: "Systemd Auto-start",        desc: "hermes-gateway boots on every instance reboot" },
   { icon: Stethoscope, label: "hermes doctor",             desc: "7-point health check runs after every deploy" },
   { icon: MapPin,      label: "Post-deploy Access Guide",  desc: "SSH, gateway, logs, and destroy — all in one output" },
   { icon: Eye,         label: "Masked Secret Input",       desc: "API keys never echo to screen or shell history" },
+  { icon: RefreshCw,   label: "Dynamic IP Update",         desc: "hermes-deploy update-ip — re-sync firewall rules when your local IP changes" },
   { icon: Zap,         label: "1-line Install",            desc: "curl | bash · auto-detects macOS or Linux" },
   { icon: HardDrive,   label: "gp3 / SSD Disks",          desc: "Encrypted root disks on all three clouds" },
+  { icon: FileCode2,   label: "Self-update Check",         desc: "CLI warns you on launch if a newer version is available on GitHub" },
 ];
 
 export default function FeatureGrid() {
