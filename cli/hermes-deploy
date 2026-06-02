@@ -122,7 +122,7 @@ cmd_help() {
   printf "  %-12s %s\n" "version" "Print version"
   echo ""
   gum style --foreground 212 --bold "OPTIONS"
-  printf "  %-20s %s\n" "--cloud aws|azure|gcp" "Target cloud provider"
+  printf "  %-20s %s\n" "--cloud aws|gcp|azure" "Target cloud provider"
   printf "  %-20s %s\n" "--region REGION"        "Cloud region (e.g. ap-east-1)"
   printf "  %-20s %s\n" "--preset PRESET"        "GCP preset (minimal|dev-agent|data-agent|ai-agent|full-ops)"
   printf "  %-20s %s\n" "--packs pack1,pack2"    "Extra GCP capability packs"
