@@ -1,28 +1,40 @@
 "use client";
-import { Sparkles, Package, MessageSquare, Monitor, Cpu, Code2, Shuffle, LayoutDashboard } from "lucide-react";
+import { Sparkles, Package, MessageSquare, Monitor, Cpu, Code2, Shuffle, LayoutDashboard, Layers, PuzzleIcon } from "lucide-react";
 
 const NEW_FEATURES = [
   {
-    icon: Package,
+    icon: Layers,
     color: "#f59e0b",
+    title: "GCP Capability Packs",
+    desc: "13 opt-in packs — Secret Manager, Vertex AI, BigQuery, Cloud Run and more. Mix presets with extra packs in one flag.",
+  },
+  {
+    icon: PuzzleIcon,
+    color: "#a78bfa",
+    title: "rekipedia VS Code Extension",
+    desc: "Ask, Search, and Wiki sidebar — full rekipedia integration inside VS Code. Scan any workspace from the command palette.",
+  },
+  {
+    icon: Package,
+    color: "#38bdf8",
     title: "pip install hermes-agent",
     desc: "Now a first-class PyPI package — install in seconds, no manual setup.",
   },
   {
     icon: MessageSquare,
-    color: "#38bdf8",
+    color: "#10b981",
     title: "22 Messaging Platforms",
     desc: "LINE and SimpleX added. Slack, Discord, Telegram, WhatsApp, and 18 more.",
   },
   {
     icon: Monitor,
-    color: "#10b981",
+    color: "#34d399",
     title: "Windows Beta Support",
     desc: "Run Hermes Agent natively on Windows — no WSL required.",
   },
   {
     icon: Cpu,
-    color: "#a78bfa",
+    color: "#e879f9",
     title: "hermes proxy",
     desc: "OpenAI-compatible local proxy — drop-in for any app that speaks the OpenAI API.",
   },
@@ -34,7 +46,7 @@ const NEW_FEATURES = [
   },
   {
     icon: Shuffle,
-    color: "#e879f9",
+    color: "#7dd3fc",
     title: "/handoff Command",
     desc: "Transfer a live session between models mid-conversation without losing context.",
   },

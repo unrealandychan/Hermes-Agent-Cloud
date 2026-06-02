@@ -9,22 +9,22 @@ const STEPS = [
   {
     n: "02",
     title: "Run the wizard",
-    desc: "Type hermes-agent-cloud and follow the interactive prompts. Choose your cloud, region, instance size, and configure your LLM API keys — all step-by-step.",
-    code: "hermes-agent-cloud",
+    desc: "Type hermes-deploy and follow the interactive prompts. Choose your cloud, region, instance size, and configure your LLM API keys — all step-by-step. GCP users can also pick a preset (minimal, dev-agent, ai-agent…) and mix in extra capability packs.",
+    code: "hermes-deploy",
     accent: "#a78bfa",
   },
   {
     n: "03",
     title: "Choose permissions & deploy",
     desc: "Select an IAM permission profile (S3, Billing, RDS, or custom). The CLI calls terraform apply and automatically attaches the right cloud policies. A live spinner tracks every step.",
-    code: "hermes-agent-cloud deploy --cloud aws",
+    code: "hermes-deploy deploy --cloud aws",
     accent: "#38bdf8",
   },
   {
     n: "04",
     title: "Manage & monitor costs",
-    desc: "SSH in, stream logs, rotate secrets, or run hermes-agent-cloud billing to check your cloud spend, service breakdown, and budget alerts — all without leaving the CLI.",
-    code: "hermes-agent-cloud billing",
+    desc: "SSH in, stream logs, rotate secrets, or run hermes-deploy billing to check your cloud spend, service breakdown, and budget alerts — all without leaving the CLI.",
+    code: "hermes-deploy billing",
     accent: "#34d399",
   },
 ];

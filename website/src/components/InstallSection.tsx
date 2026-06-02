@@ -5,13 +5,18 @@ import { Copy, Check } from "lucide-react";
 const INSTALL_CMD = `curl -sSL https://raw.githubusercontent.com/unrealandychan/Hermes-Agent-Cloud/main/cli/install.sh | bash`;
 
 const COMMANDS = [
-  { cmd: "hermes-agent-cloud",                          desc: "Launch interactive wizard" },
-  { cmd: "hermes-agent-cloud deploy --cloud aws",       desc: "Deploy to AWS (flags mode)" },
-  { cmd: "hermes-agent-cloud status --cloud azure",     desc: "Show running instance info" },
-  { cmd: "hermes-agent-cloud ssh --cloud gcp",          desc: "SSH into the instance" },
-  { cmd: "hermes-agent-cloud logs --cloud aws",         desc: "Tail journalctl logs" },
-  { cmd: "hermes-agent-cloud secrets --cloud azure",    desc: "Update API keys in Key Vault" },
-  { cmd: "hermes-agent-cloud destroy --cloud aws",      desc: "Tear down infra completely" },
+  { cmd: "hermes-deploy",                               desc: "Launch interactive wizard" },
+  { cmd: "hermes-deploy deploy --cloud aws",            desc: "Deploy to AWS (flags mode)" },
+  { cmd: "hermes-deploy deploy --cloud gcp --preset ai-agent --packs vertexai,storage", desc: "GCP deploy with AI preset + extra packs" },
+  { cmd: "hermes-deploy open",                          desc: "Open gateway URL in browser" },
+  { cmd: "hermes-deploy tunnel",                        desc: "SSH tunnel to gateway (port 8080)" },
+  { cmd: "hermes-deploy update-ip",                     desc: "Re-sync firewall to your current IP" },
+  { cmd: "hermes-deploy status --cloud azure",          desc: "Show running instance info" },
+  { cmd: "hermes-deploy ssh --cloud gcp",               desc: "SSH into the instance" },
+  { cmd: "hermes-deploy logs --cloud aws",              desc: "Tail journalctl logs" },
+  { cmd: "hermes-deploy secrets --cloud azure",         desc: "Update API keys in Key Vault" },
+  { cmd: "hermes-deploy billing",                       desc: "Cost summary, top services, budget alerts" },
+  { cmd: "hermes-deploy destroy --cloud aws",           desc: "Tear down infra completely" },
 ];
 
 function CopyButton({ text }: { text: string }) {
