@@ -511,6 +511,7 @@ gcp_wizard() {
   config_set "gcp_budget_amount"   "$budget_amount"
   config_set "gcp_labels"          "$labels_csv"
   config_set "billing_account"     "$billing_account"
+  config_set "gcp_bigquery_dataset" "$dataset_id"
 
   if [[ "$DRY_RUN" == "true" ]]; then
     warn "Dry run — showing plan only, no resources will be created."
@@ -624,7 +625,7 @@ gcp_secrets() {
 }
 
 gcp_doctor() {
-  local project_id zone tf_dir allowed_cidr preset packs billing_account sa_email
+  local project_id zone tf_dir allowed_cidr preset packs billing_account sa_email dataset_id
   project_id=$(config_get "project_id")
   zone=$(config_get "zone")
   tf_dir=$(config_get "tf_dir")
@@ -633,6 +634,8 @@ gcp_doctor() {
   packs=$(config_get "gcp_packs")
   billing_account=$(config_get "billing_account")
   sa_email=$(config_get "service_account_email")
+  dataset_id=$(config_get "gcp_bigquery_dataset")
+  [[ -z "$dataset_id" ]] && dataset_id="hermes_agent"
 
   [[ -z "$project_id" || -z "$zone" ]] && {
     error "No saved GCP deployment config found."
@@ -666,7 +669,7 @@ gcp_doctor() {
   gcp_doctor_check "Gateway firewall remains restricted." "Gateway firewall rule appears broad or missing." \
     "gcloud compute firewall-rules describe hermes-allow-gateway --project '$project_id' --format='value(sourceRanges[0])' | grep -qx '$allowed_cidr'"
   gcp_doctor_check "Billing export dataset exists." "Billing export dataset not detected; cost breakdown will stay advisory only." \
-    "bq --project_id '$project_id' ls -d 2>/dev/null | grep -q 'hermes_agent'"
+    "bq --project_id '$project_id' ls -d 2>/dev/null | awk '{print \$1}' | grep -qx '$dataset_id'"
 
   if [[ -n "$tf_dir" ]]; then
     gcp_doctor_check "Terraform state directory still exists." "Terraform directory is missing." \
