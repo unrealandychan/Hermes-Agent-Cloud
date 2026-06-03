@@ -4,7 +4,7 @@
 #    or: bash install.sh  (from a local clone)
 set -euo pipefail
 
-HERMES_DEPLOY_VERSION="1.5.0"
+HERMES_DEPLOY_VERSION="1.5.1"
 INSTALL_BIN="/usr/local/bin"
 INSTALL_LIB="/usr/local/lib/hermes-agent-cloud"
 
@@ -263,8 +263,17 @@ install_hermes_deploy() {
     trap 'rm -rf '"$tmp_dir" EXIT
 
     local archive_url="https://github.com/unrealandychan/Hermes-Agent-Cloud/archive/refs/tags/v${HERMES_DEPLOY_VERSION}.tar.gz"
-    info "Downloading from ${archive_url}..."
-    curl -fsSL "$archive_url" | tar -xz -C "$tmp_dir" --strip-components=1
+    local main_archive_url="https://github.com/unrealandychan/Hermes-Agent-Cloud/archive/refs/heads/main.tar.gz"
+
+    # Try tagged release first; fallback to main branch if tag doesn't exist or download fails
+    info "Downloading v${HERMES_DEPLOY_VERSION} from GitHub..."
+    if curl -fsSL --head "$archive_url" &>/dev/null \
+       && curl -fsSL "$archive_url" | tar -xz -C "$tmp_dir" --strip-components=1 2>/dev/null; then
+      info "Using tagged release v${HERMES_DEPLOY_VERSION}"
+    else
+      warn "Tag v${HERMES_DEPLOY_VERSION} not found or download failed — falling back to main branch"
+      curl -fsSL "$main_archive_url" | tar -xz -C "$tmp_dir" --strip-components=1
+    fi
 
     for candidate_dir in "$tmp_dir/cli" "$tmp_dir"; do
       if [[ -f "$candidate_dir/hermes-deploy" ]]; then
@@ -279,14 +288,9 @@ install_hermes_deploy() {
     done
 
     if [[ -n "$main_bin" ]] && ! is_modern_cli_entrypoint "$src_dir/$main_bin"; then
-      warn "Tagged archive contains an outdated CLI entrypoint; switching to latest main branch payload."
+      warn "Archive contains an outdated CLI entrypoint; retrying from main branch..."
       src_dir=""
       main_bin=""
-    fi
-
-    if [[ -z "$main_bin" ]]; then
-      local main_archive_url="https://github.com/unrealandychan/Hermes-Agent-Cloud/archive/refs/heads/main.tar.gz"
-      info "Tagged archive did not contain a usable CLI; retrying from ${main_archive_url}..."
 
       local tmp_main_dir
       tmp_main_dir=$(mktemp -d)
