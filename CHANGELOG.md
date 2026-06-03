@@ -4,13 +4,10 @@ All notable changes to Hermes Agent Cloud will be documented in this file.
 
 ## [Unreleased]
 
-### Added
-- GCP presets, capability packs, explain-plan flow, and repeatable profile-file deploys
-- `hermes-agent-cloud doctor` for GCP deployment diagnostics
+## [1.5.1] - 2026-06-03
 
-### Changed
-- GCP Terraform now manages a static IP, custom VPC/subnet, declarative IAM bindings, API enablement, optional budgets, and managed pack resources
-- CI now checks GCP catalog integrity plus IAM / firewall policy safety
+### Fixed
+- `update-ip` command: macOS BSD `sed -i` now uses `sed -i ''` to avoid "invalid command code" error on macOS 14+
 
 ## [1.1.0] - 2026-05-26
 
