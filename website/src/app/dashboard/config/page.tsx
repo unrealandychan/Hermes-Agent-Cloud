@@ -86,13 +86,15 @@ function CopyButton({ text }: { text: string }) {
 
 function DownloadButton({ text }: { text: string }) {
   const handleDownload = useCallback(() => {
-    const blob = new Blob([text], { type: "text/yaml" });
+    const blob = new Blob([text], { type: "text/yaml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "hermes.yaml";
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }, [text]);
 
   return (
