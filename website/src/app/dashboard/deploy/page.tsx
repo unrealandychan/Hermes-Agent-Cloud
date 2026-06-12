@@ -358,12 +358,11 @@ function StepReview({ state, update }: { state: WizardState; update: (s: Partial
       {/* Dry-run toggle */}
       <label
         className="flex items-center gap-3 cursor-pointer select-none"
-        onClick={() => update({ dryRun: !state.dryRun })}
       >
         <input
           type="checkbox"
           checked={state.dryRun}
-          onChange={() => update({ dryRun: !state.dryRun })}
+          onChange={(e) => update({ dryRun: e.target.checked })}
           className="sr-only"
         />
         <div
