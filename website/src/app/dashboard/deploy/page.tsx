@@ -44,6 +44,7 @@ function buildCommand(state: WizardState): string {
   if (!state.cloud) return "hermes-agent-cloud deploy";
   const parts = ["hermes-agent-cloud deploy", `--cloud ${state.cloud}`];
   if (state.region) parts.push(`--region ${state.region}`);
+  if (state.instanceSize) parts.push(`--size ${state.instanceSize}`);
   if (state.cloud === "gcp" && state.gcpPreset) parts.push(`--preset ${state.gcpPreset}`);
   if (state.cloud === "gcp" && state.gcpExtraPacks.length > 0)
     parts.push(`--packs ${state.gcpExtraPacks.join(",")}`);
@@ -434,12 +435,13 @@ export default function DeployWizard() {
             <div key={s.id} className="flex items-center gap-1">
               <button
                 onClick={() => i <= step && setStep(i)}
+                title={done ? `Go back to ${s.label}` : undefined}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all"
                 style={{
                   background: active ? "rgba(245,158,11,0.12)" : done ? "rgba(16,185,129,0.08)" : "transparent",
                   color: active ? "var(--amber)" : done ? "#10b981" : "var(--text-dim)",
                   border: active ? "1px solid rgba(245,158,11,0.3)" : done ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
-                  cursor: i <= step ? "pointer" : "default",
+                  cursor: done ? "pointer" : i === step ? "default" : "not-allowed",
                 }}
                 disabled={i > step}
               >

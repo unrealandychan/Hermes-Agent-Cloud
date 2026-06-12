@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Download } from "lucide-react";
 
 type HermesConfig = {
   terminalBackend: "docker" | "local";
@@ -80,6 +80,33 @@ function CopyButton({ text }: { text: string }) {
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? "Copied!" : "Copy YAML"}
+    </button>
+  );
+}
+
+function DownloadButton({ text }: { text: string }) {
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([text], { type: "text/yaml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "hermes.yaml";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [text]);
+
+  return (
+    <button
+      onClick={handleDownload}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-all"
+      style={{
+        borderColor: "var(--border)",
+        color: "var(--text-muted)",
+        background: "transparent",
+      }}
+    >
+      <Download size={12} />
+      Download
     </button>
   );
 }
@@ -258,7 +285,10 @@ export default function ConfigBuilderPage() {
         <div className="flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-white">hermes.yaml preview</p>
-            <CopyButton text={yaml} />
+            <div className="flex items-center gap-2">
+              <DownloadButton text={yaml} />
+              <CopyButton text={yaml} />
+            </div>
           </div>
           <div className="terminal flex-1">
             <div className="terminal-bar">

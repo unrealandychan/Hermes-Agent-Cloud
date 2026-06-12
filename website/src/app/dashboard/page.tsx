@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Rocket, Terminal, Settings, ArrowRight } from "lucide-react";
+import { Rocket, Terminal, Settings, Newspaper, ArrowRight } from "lucide-react";
 
 const CARDS = [
   {
@@ -22,6 +22,13 @@ const CARDS = [
     title: "Config Builder",
     description: "Build and export a ready-to-use hermes.yaml configuration file visually.",
     accent: "#06b6d4",
+  },
+  {
+    href: "/changelog",
+    icon: Newspaper,
+    title: "What's New",
+    description: "Latest releases, new commands, and CLI improvements across all cloud providers.",
+    accent: "#10b981",
   },
 ];
 
@@ -47,7 +54,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick-start cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
         {CARDS.map(({ href, icon: Icon, title, description, accent }) => (
           <Link
             key={href}
