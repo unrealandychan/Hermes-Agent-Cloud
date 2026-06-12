@@ -49,10 +49,10 @@ export default function CommandsPage() {
   const [cloudFilter, setCloudFilter] = useState<CloudProvider | "all">("all");
 
   const filtered = CLI_COMMANDS.filter((c) => {
+    const q = query.toLowerCase();
     const matchesSearch =
-      c.name.includes(query.toLowerCase()) ||
-      c.description.toLowerCase().includes(query.toLowerCase());
-    const matchesCloud =
+      c.name.toLowerCase().includes(q) ||
+      c.description.toLowerCase().includes(q);
       cloudFilter === "all" ||
       !c.cloud ||
       c.cloud.includes(cloudFilter as CloudProvider);
