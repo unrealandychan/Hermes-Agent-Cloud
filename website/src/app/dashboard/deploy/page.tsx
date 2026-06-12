@@ -309,7 +309,7 @@ function StepApi() {
   );
 }
 
-function StepReview({ state }: { state: WizardState }) {
+function StepReview({ state, update }: { state: WizardState; update: (s: Partial<WizardState>) => void }) {
   const command = buildCommand(state);
 
   const summaryRows = [
@@ -355,11 +355,14 @@ function StepReview({ state }: { state: WizardState }) {
       </div>
 
       {/* Dry-run toggle */}
-      <label className="flex items-center gap-3 cursor-pointer select-none">
+      <label
+        className="flex items-center gap-3 cursor-pointer select-none"
+        onClick={() => update({ dryRun: !state.dryRun })}
+      >
         <input
           type="checkbox"
           checked={state.dryRun}
-          onChange={() => {}}
+          onChange={() => update({ dryRun: !state.dryRun })}
           className="sr-only"
         />
         <div
@@ -406,7 +409,7 @@ export default function DeployWizard() {
     <StepSize     key="size"   state={state} update={update} />,
     <StepPacks    key="packs"  state={state} update={update} />,
     <StepApi      key="api" />,
-    <StepReview   key="review" state={state} />,
+    <StepReview   key="review" state={state} update={update} />,
   ];
 
   return (
