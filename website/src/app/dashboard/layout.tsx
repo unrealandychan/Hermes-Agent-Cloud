@@ -13,6 +13,14 @@ const NAV_ITEMS = [
   { href: "/changelog",          label: "What's New", icon: Newspaper },
 ];
 
+// Top-level routes that should not be treated as prefixes for active matching
+const EXACT_MATCH_HREFS = new Set(["/dashboard", "/changelog"]);
+
+function isNavItemActive(href: string, pathname: string): boolean {
+  if (EXACT_MATCH_HREFS.has(href)) return pathname === href;
+  return pathname.startsWith(href);
+}
+
 // Map href → human-readable breadcrumb label
 const BREADCRUMB_LABELS: Record<string, string> = {
   "/dashboard":          "Overview",
@@ -70,7 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Nav items */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href || (href !== "/dashboard" && href !== "/changelog" && pathname.startsWith(href));
+            const active = isNavItemActive(href, pathname);
             return (
               <Link
                 key={href}
@@ -135,7 +143,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Drawer nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href || (href !== "/dashboard" && href !== "/changelog" && pathname.startsWith(href));
+            const active = isNavItemActive(href, pathname);
             return (
               <Link
                 key={href}

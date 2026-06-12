@@ -161,7 +161,7 @@ export const CLI_COMMANDS: CliCommand[] = [
   {
     name: "deploy",
     description: "Deploy Hermes Agent to a cloud provider. Launches an interactive wizard if no flags are supplied.",
-    flags: ["--cloud aws|gcp|azure", "--region REGION", "--preset PRESET (GCP)", "--packs pack1,pack2 (GCP)", "--config FILE", "--dry-run", "--explain"],
+    flags: ["--cloud aws|gcp|azure", "--region REGION", "--size SIZE", "--preset PRESET (GCP)", "--packs pack1,pack2 (GCP)", "--config FILE", "--dry-run", "--explain"],
     examples: [
       "hermes-agent-cloud deploy --cloud aws",
       "hermes-agent-cloud deploy --cloud gcp --dry-run",
