@@ -190,8 +190,8 @@ export default function ConfigBuilderPage() {
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           Visually configure{" "}
           <code style={{ fontFamily: "var(--font-mono)", color: "var(--amber)" }}>hermes.yaml</code> and copy
-          the result. Place the file at{" "}
-          <code style={{ fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>~/.hermes-agent-cloud/hermes.yaml</code>.
+          the result. After deployment, upload it to{" "}
+          <code style={{ fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>~/.hermes/config.yaml</code> on your instance.
         </p>
       </div>
 
