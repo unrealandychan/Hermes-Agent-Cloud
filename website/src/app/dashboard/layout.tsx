@@ -135,7 +135,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
             <span className="text-white">Hermes Cloud</span>
           </Link>
-          <button onClick={() => setDrawerOpen(false)} style={{ color: "var(--text-dim)" }}>
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(false)}
+            style={{ color: "var(--text-dim)" }}
+            aria-label="Close menu"
+          >
             <X size={18} />
           </button>
         </div>
