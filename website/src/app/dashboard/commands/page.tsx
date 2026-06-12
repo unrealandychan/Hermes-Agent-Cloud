@@ -53,6 +53,7 @@ export default function CommandsPage() {
     const matchesSearch =
       c.name.toLowerCase().includes(q) ||
       c.description.toLowerCase().includes(q);
+    const matchesCloud =
       cloudFilter === "all" ||
       !c.cloud ||
       c.cloud.includes(cloudFilter as CloudProvider);
