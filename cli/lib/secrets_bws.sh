@@ -146,9 +146,11 @@ cmd_secrets_bws() {
   [[ -z "$ip" ]]      && { error "Cannot determine VM IP from config."; return 1; }
   [[ -z "$ssh_key" ]] && { error "Cannot determine SSH key from config."; return 1; }
 
-  # ── 8. Push the four standard keys via ssh_upload_env ────────────────────
+  # ─── 8. Push the four standard keys via ssh_upload_env ────────────────
   if [[ -n "$openrouter_key" || -n "$openai_key" || -n "$anthropic_key" || -n "$gemini_key" ]]; then
-    ssh_upload_env "$ip" "$ssh_user" "$ssh_key" \
+    local active_profile
+    active_profile="$(_ssh_active_profile)"
+    ssh_upload_env "$ip" "$ssh_user" "$ssh_key" "$active_profile" \
       "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key"
   fi
 

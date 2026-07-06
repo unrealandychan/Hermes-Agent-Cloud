@@ -533,8 +533,11 @@ gcp_wizard() {
   config_set "service_account_email" "$sa_email"
 
   local gcp_ssh_key="$HOME/.ssh/google_compute_engine"
+  local active_profile
+  active_profile="$(_ssh_active_profile)"
   ssh_wait "$ip" "ubuntu" "$gcp_ssh_key"
-  ssh_install "$ip" "ubuntu" "$gcp_ssh_key" "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
+  ssh_upload_profile_keys "$ip" "ubuntu" "$gcp_ssh_key"
+  ssh_install "$ip" "ubuntu" "$gcp_ssh_key" "$active_profile" "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
 
   post_deploy_guide "gcp" "$ip" "hermes-instance" "$zone" "$gcp_ssh_key"
 }

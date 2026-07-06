@@ -62,17 +62,21 @@ ssh_wait() {
   return 1
 }
 
-# ─── Upload API keys to ~/.hermes/.env ──────────────────────────────────────
-# ssh_upload_env <ip> <user> <key_path> <openrouter> <openai> <anthropic> <gemini>
+# ─── Upload API keys to the Hermes profile .env on the remote VM ─────────────
+# ssh_upload_env <ip> <user> <key_path> <profile> <openrouter> <openai> <anthropic> <gemini>
 # Keys are piped via stdin — they are never embedded in the command string.
+# The profile argument controls the destination directory:
+#   "default" -> ~/.hermes/.env
+#   "<name>"  -> ~/.hermes-profiles/<name>/.env
 ssh_upload_env() {
   local ip="$1"
   local user="$2"
   local key="$3"
-  local openrouter_key="$4"
-  local openai_key="$5"
-  local anthropic_key="$6"
-  local gemini_key="$7"
+  local profile_name="${4:-default}"
+  local openrouter_key="$5"
+  local openai_key="$6"
+  local anthropic_key="$7"
+  local gemini_key="$8"
 
   key="${key/#\~/$HOME}"
   _fix_key_permissions "$key"
@@ -87,42 +91,107 @@ ssh_upload_env() {
     [[ -n "$gemini_key"     ]] && printf 'GEMINI_API_KEY=%s\n'     "$gemini_key"     || true
   )
 
-  warn "Uploading API keys to ${user}@${ip}:~/.hermes/.env ..."
+  if [[ -z "$env_content" ]]; then
+    warn "No API keys provided — skipping remote .env upload."
+    return 0
+  fi
+
+  local env_dir
+  if [[ "$profile_name" == "default" ]]; then
+    env_dir="/home/${user}/.hermes"
+  else
+    env_dir="/home/${user}/.hermes-profiles/${profile_name}"
+  fi
+
+  warn "Uploading API keys to ${user}@${ip}:${env_dir}/.env (profile: ${profile_name}) ..."
   # Pipe via stdin — value never appears in the remote command string.
   printf '%s' "$env_content" | ssh -i "$key" \
       -o StrictHostKeyChecking=accept-new \
       -o ConnectTimeout=10 \
       "${user}@${ip}" \
-      'mkdir -p ~/.hermes && cat > ~/.hermes/.env && chmod 600 ~/.hermes/.env'
+      "mkdir -p ${env_dir} && cat > ${env_dir}/.env && chmod 600 ${env_dir}/.env"
 
-  success "API keys uploaded."
+  success "API keys uploaded for profile '${profile_name}'."
 }
 
-# ─── Run bootstrap.sh on the remote VM via SSH ──────────────────────────────
-# ssh_install <ip> <user> <key_path> <bootstrap_script_path>
+# ─── Run bootstrap.sh on the remote VM via SSH ──────────────────────
+# ssh_install <ip> <user> <key_path> <profile> <bootstrap_script_path>
 # Output is streamed directly to the terminal so the user sees every step.
 ssh_install() {
   local ip="$1"
   local user="$2"
   local key="$3"
-  local bootstrap="$4"
+  local profile_name="${4:-default}"
+  local bootstrap="$5"
 
   key="${key/#\~/$HOME}"
   _fix_key_permissions "$key"
 
   echo ""
-  gum style --foreground 212 --bold "  ─── Installing Hermes Agent via SSH ────────────────────────"
+  gum style --foreground 212 --bold "  ─── Installing Hermes Agent via SSH ───────────────────"
   warn "Streaming install output from ${ip} (this takes ~3-5 min)..."
+  warn "Profile: ${profile_name}"
   echo ""
 
   ssh -i "$key" \
       -o StrictHostKeyChecking=accept-new \
       -o ConnectTimeout=15 \
       "${user}@${ip}" \
-      "sudo bash -s -- --user '${user}'" < "$bootstrap"
+      "sudo bash -s -- --user '${user}' --profile '${profile_name}'" < "$bootstrap"
 
   echo ""
-  success "Remote installation complete."
+  success "Remote installation complete for profile '${profile_name}'."
+}
+
+# Return the active Hermes profile name (defaults to "default").
+_ssh_active_profile() {
+  if command -v profile_get_active &>/dev/null; then
+    profile_get_active
+  else
+    echo "default"
+  fi
+}
+
+# Return the path to the named profile's .env file on the local machine.
+_ssh_local_env_file() {
+  local profile_name="${1:-$(_ssh_active_profile)}"
+  if [[ "$profile_name" == "default" ]]; then
+    echo "${HOME}/.hermes/.env"
+  else
+    echo "${HOME}/.hermes-profiles/${profile_name}/.env"
+  fi
+}
+
+# Read keys from the local profile .env and upload them to the remote VM.
+# ssh_upload_profile_keys <ip> <user> <key_path>
+ssh_upload_profile_keys() {
+  local ip="$1"
+  local user="$2"
+  local key="$3"
+  local profile_name="$(_ssh_active_profile)"
+  local env_file
+  env_file="$(_ssh_local_env_file "$profile_name")"
+
+  if [[ ! -f "$env_file" ]]; then
+    warn "Profile '${profile_name}' has no local .env file at ${env_file}."
+    warn "You will need to set API keys on the VM before Hermes can start."
+    warn "Run: hermes-agent-cloud secrets"
+    return 0
+  fi
+
+  local openrouter_key="" openai_key="" anthropic_key="" gemini_key=""
+  while IFS='=' read -r k v; do
+    [[ -z "$k" || "$k" == \#* ]] && continue
+    case "$k" in
+      OPENROUTER_API_KEY) openrouter_key="$v" ;;
+      OPENAI_API_KEY)     openai_key="$v"     ;;
+      ANTHROPIC_API_KEY)  anthropic_key="$v"  ;;
+      GEMINI_API_KEY)     gemini_key="$v"     ;;
+    esac
+  done < "$env_file"
+
+  ssh_upload_env "$ip" "$user" "$key" "$profile_name" \
+    "$openrouter_key" "$openai_key" "$anthropic_key" "$gemini_key"
 }
 
 # ─── Update a single key in ~/.hermes/.env and restart the gateway ──────────

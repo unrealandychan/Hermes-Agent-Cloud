@@ -195,12 +195,15 @@ EOF
   config_set "instance_id" "$instance_id"
   [[ -n "$ebs_volume_id" ]] && config_set "ebs_volume_id" "$ebs_volume_id"
 
-  # ── SSH-based installation ─────────────────────────────────────────────────
+  # ─── SSH-based installation ─────────────────────────────────────
+  local active_profile
+  active_profile="$(_ssh_active_profile)"
   ssh_wait    "$ip" "ubuntu" "$ssh_key_path"
-  ssh_install "$ip" "ubuntu" "$ssh_key_path" \
+  ssh_upload_profile_keys "$ip" "ubuntu" "$ssh_key_path"
+  ssh_install "$ip" "ubuntu" "$ssh_key_path" "$active_profile" \
     "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
 
-  # ── Mount EBS data volume ─────────────────────────────────────────────────
+  # ─── Mount EBS data volume ────────────────────────────────────────
   if [[ "$ebs_enabled" == "true" && -n "$ebs_volume_id" ]]; then
     warn "Mounting persistent data volume on instance..."
     PUBLIC_IP="$ip" SSH_KEY="$ssh_key_path" ebs_attach "$instance_id"
@@ -316,10 +319,22 @@ aws_secrets() {
   ssh_update_key "$ip" "ubuntu" "$ssh_key" "$var_name" "$new_value"
 }
 
-# ─── Destroy ────────────────────────────────────────────────────────────────
+# ─── Destroy ────────────────────────────────────────────────────────
 aws_destroy() {
-  local tf_dir
+  local tf_dir ebs_enabled
   tf_dir=$(config_get "tf_dir")
+  ebs_enabled="$(config_get "ebs_enabled" 2>/dev/null || echo "false")"
+
+  if [[ "$ebs_enabled" == "true" ]]; then
+    warn "EBS data volume was enabled for this deployment."
+    warn "Running 'terraform destroy' will delete the persistent data volume and ALL DATA on it."
+    warn "To keep the volume, run 'hermes-agent-cloud ebs detach' first, then destroy."
+    if ! gum confirm "Delete the persistent EBS volume and all its data?"; then
+      warn "Aborted. Detach the volume first if you want to keep it."
+      exit 0
+    fi
+  fi
+
   spinner "Destroying AWS infrastructure..." \
     terraform -chdir="$tf_dir" destroy -auto-approve -no-color
   success "All AWS resources destroyed."

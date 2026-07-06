@@ -8,21 +8,50 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Added
+---
 
-- GCP presets and capability-pack catalog (`minimal`, `dev-agent`, `data-agent`, `ai-agent`, `full-ops`)
-- GCP config-driven deploy template: `cli/config/gcp-profile.env.tpl`
-- `hermes-agent-cloud doctor` command with GCP-focused deployment checks
-- GCP IAM / firewall policy checks in CI
+## [1.6.0] — 2026-07-07
+
+### Overview
+
+This release fixes three deployment reliability issues reported by users:
+
+1. **Bootstrap failed because `.env` was missing** — API keys were not always uploaded to the VM before `bootstrap.sh` ran, especially when using named profiles or deploying to GCP/Azure.
+2. **Multi-profile deployments wrote keys to the wrong directory** — `ssh_upload_env` always wrote to `~/.hermes/.env`, even when the active profile expected `~/.hermes-profiles/<name>/.env`.
+3. **`hermes-agent-cloud destroy` failed on AWS with EBS enabled** — the persistent data volume had `prevent_destroy = true`, causing Terraform to error out instead of completing the teardown.
+
+### Fixed
+
+#### Multi-profile API key delivery
+
+- `ssh_upload_env` now accepts a profile name and writes keys to the correct profile directory on the remote VM.
+- `ssh_install` now passes `--profile <name>` to `bootstrap.sh` so the gateway service uses the matching `HERMES_HOME`.
+- New helper `ssh_upload_profile_keys` reads the active profile's local `.env` and uploads it before bootstrap runs.
+
+#### Cross-cloud deploy consistency
+
+- AWS, GCP, and Azure deploy wizards all now call `ssh_upload_profile_keys` before `ssh_install`.
+- This removes the difference where only AWS (via a separate secrets flow) had any chance of having keys on the VM at bootstrap time.
+
+#### AWS destroy with EBS
+
+- Removed `prevent_destroy = true` from `modules/aws/ebs.tf` and `cli/terraform/aws/ebs.tf`.
+- `aws_destroy()` now checks `ebs_enabled` and prompts for explicit confirmation before deleting the volume.
+- Users who want to keep data can run `hermes-agent-cloud ebs detach` before `destroy`.
 
 ### Changed
 
-- GCP deploys now use declarative Terraform-managed APIs, service account bindings, static public IP, custom VPC/subnet, and managed capability-pack resources
-- GCP wizard now includes explain-plan output, project readiness checks, optional monthly budgets, and preset-driven capability selection
+- `ssh_upload_env <ip> <user> <key> <profile> <openrouter> <openai> <anthropic> <gemini>`
+- `ssh_install <ip> <user> <key> <profile> <script>`
+
+### Migration Notes
+
+- Existing single-instance (`default` profile) deployments are unaffected.
+- If you previously worked around the EBS destroy issue by manually targeting resources, `hermes-agent-cloud destroy` will now work end-to-end but will ask for confirmation when an EBS volume exists.
 
 ---
 
-## [1.4.0] — 2026-06-01
+## [1.5.0] — 2026-06-01
 
 ### Overview
 

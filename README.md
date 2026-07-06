@@ -263,6 +263,26 @@ Each profile runs as its own **systemd service** (`hermes-default`, `hermes-work
 
 > **Backward compatibility:** Existing single-instance deployments continue to work unchanged — they are automatically treated as the `default` profile.
 
+### Profile Deploy Behavior
+
+When you deploy with an active profile, the CLI:
+
+1. Reads API keys from the profile's local `.env` file (`~/.hermes-profiles/<name>/.env`, or `~/.hermes/.env` for `default`).
+2. Uploads the keys to the **same profile path on the remote VM** before running bootstrap.
+3. Runs `bootstrap.sh --profile <name>` so the gateway service (`hermes-<name>.service`) looks in the correct directory.
+
+This ensures multi-profile deployments no longer accidentally write keys to the wrong directory.
+
+### Keeping Data on AWS Destroy
+
+AWS deployments can optionally create a **persistent EBS data volume** that survives instance replacement. Starting with v1.6.0, this volume is **not protected from `terraform destroy` by default**:
+
+- `hermes-agent-cloud destroy` will now **delete the EBS volume and all data on it** unless you detach it first.
+- To keep your data, run `hermes-agent-cloud ebs detach` before `destroy`.
+- The destroy wizard will warn you and ask for confirmation when an EBS volume is present.
+
+If you want fully automated destruction without prompts, export `HERMES_YOLO_MODE=1`.
+
 ---
 
 ## Run the Website Locally

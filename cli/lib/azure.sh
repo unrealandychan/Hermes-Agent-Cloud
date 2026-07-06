@@ -195,9 +195,12 @@ EOF
     fi
   fi
 
-  # ── SSH-based installation ─────────────────────────────────────────────────
+  # ─── SSH-based installation ─────────────────────────────────────
+  local active_profile
+  active_profile="$(_ssh_active_profile)"
   ssh_wait    "$ip" "azureuser" "$ssh_private_key"
-  ssh_install "$ip" "azureuser" "$ssh_private_key" \
+  ssh_upload_profile_keys "$ip" "azureuser" "$ssh_private_key"
+  ssh_install "$ip" "azureuser" "$ssh_private_key" "$active_profile" \
     "${HERMES_DEPLOY_DIR}/scripts/bootstrap.sh"
 
   post_deploy_guide "azure" "$ip" "$instance_id" "$REGION" "$ssh_private_key"

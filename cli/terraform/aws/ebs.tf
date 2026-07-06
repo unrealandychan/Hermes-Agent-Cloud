@@ -5,7 +5,7 @@
 # volume (and all Hermes data) survives. Re-attach it to any new instance
 # via:  hermes-agent-cloud ebs attach
 #
-# ─── Volume ──────────────────────────────────────────────────────────────────
+# ─── Volume ────────────────────────────────────────────────────────
 resource "aws_ebs_volume" "hermes_data" {
   count             = var.ebs_enabled ? 1 : 0
   availability_zone = aws_instance.hermes.availability_zone
@@ -23,9 +23,6 @@ resource "aws_ebs_volume" "hermes_data" {
   }
 
   lifecycle {
-    # Prevents accidental deletion via `terraform destroy` (full run).
-    # To intentionally remove: terraform destroy -target=aws_ebs_volume.hermes_data
-    prevent_destroy = true
     # Do not force re-create if size or type is changed — AWS supports live resize
     ignore_changes  = [size, type, iops, throughput]
   }
